@@ -183,7 +183,7 @@ install(PROGRAMS
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  launch/run.launch
+  launch/run_all.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
