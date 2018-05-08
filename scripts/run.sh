@@ -12,7 +12,7 @@ source /opt/hansonrobotics/ros/setup.bash
 # hrtool workspace
 HR_WS="$(hr env | grep HR_WORKSPACE | cut -d = -f 2)"
 
-source $HR_WS/HEAD/devel/setup.bash # source ROS workspace within HEAD stack
+source ${HR_WS}/HEAD/devel/setup.bash # source ROS workspace within HEAD stack
 
 # The HEAD setup has its own python virutal environment thus the need to update
 # the PYTHONPATH
