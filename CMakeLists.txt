@@ -164,6 +164,11 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
   scripts/run.sh
+  sensors/main.py
+  scripts/cogserver.sh
+  scripts/cogserver-shell.sh
+  scripts/relex.sh
+  scripts/head.sh
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
