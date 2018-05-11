@@ -1,3 +1,0 @@
-<launch>
-    <node name="ros_opencog_bridge" pkg="ros_behavior_scripting" type="run.sh" />
-</launch>

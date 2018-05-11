@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find ros_people_model)/launch/devhead.launch" />
+    <param name="robot_name" value="sophia4"/>
+    <node name="opencog_bridge" pkg="opencog_bridge" type="opencog_bridge_node.py" />
+</launch>

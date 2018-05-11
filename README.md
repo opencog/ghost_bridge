@@ -72,6 +72,26 @@ bash scripts/run.sh <robot-name>
 ```
 <robot-name> could be `han` or `sophia10`
 
+
+Ghost
+-------------------------------
+
+In the cogserver shell type:
+```bash
+agents-start opencog::AFImportanceDiffusionAgent opencog::WAImportanceDiffusionAgent opencog::AFRentCollectionAgent opencog::WARentCollectionAgent
+```
+
+In the cogserver guile shell enter:
+```scheme
+(ghost-parse "u: (hi) Hello ^keep()")
+```
+
+Then back in the cogserver shell enter:
+```scheme
+(ghost "hi")
+```
+
+
 TODO
 ----
  * Need major overhaul of the time-space server API's. Need to be able
@@ -79,3 +99,5 @@ TODO
  * Need to create time-query atoms
  * Need to place sound-source direction into the space-server. (i.e. currently
    in time-map.scm map-sound)
+   
+

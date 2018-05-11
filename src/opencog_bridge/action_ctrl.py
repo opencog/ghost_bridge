@@ -30,10 +30,7 @@ from blender_api_msgs.msg import SaccadeCycle
 from blender_api_msgs.msg import SetGesture
 from blender_api_msgs.msg import SomaState
 from blender_api_msgs.msg import Target
-# from chatbot.msg import ChatMessage
-# from msg import ChatMessage
 from hr_msgs.msg import ChatMessage
-# Eva ROS message imports
 from std_msgs.msg import String, Int32
 
 logger = logging.getLogger('hr.OpenCog_Eva')
@@ -62,7 +59,7 @@ logger = logging.getLogger('hr.OpenCog_Eva')
 # `/behavior_control`, which is used to enable/disable the publication
 #      of classes of expression/gesture messages.
 #
-class EvaControl:
+class ActionCtrl:
     # Control bitflags. Bit-wise anded with control_mode. If the bit
     # is set, then the corresponding ROS message is emitted, else it
     # is not.
@@ -72,6 +69,100 @@ class EvaControl:
     C_SACCADE = 8
     C_EYES = 16
     C_FACE = 32
+
+    def __init__(self):
+        # Full control by default
+        self.control_mode = 255
+        self.running = True
+
+        # The below will hang until roscore is started!
+        rospy.init_node("opencog_bridge_actions")
+        print("Starting opencog_bridge_actions node")
+
+        # ----------------
+        # Obtain the blender-to-camera coordinate-frame conversion
+        # matrix.  XXX FIXME This is some insane hack that does not
+        # make sense.  All 3D coordinates are supposed to be in
+        # head-centered coordinates, bot for the sensory subsystem,
+        # and also for the look-at subsystem. However, someone
+        # screwed something up somewhere, and now we hack around
+        # it here. XXX This is really bad spaghetti-code programming.
+        # Fuck.
+        lstn = tf.TransformListener()
+        # try:
+        #     print("Waiting for the camera-blender transform\n")
+        #     lstn.waitForTransform('camera', 'blender', rospy.Time(0), rospy.Duration(10.0))  # world
+        # except Exception:
+        #     print("No camera transforms!\n")
+        #     exit(1)
+        #
+        # print("Got the camera-blender transform\n")
+        # (trans, rot) = lstn.lookupTransform(
+        #     'blender', 'camera', rospy.Time(0))
+        # a = tf.listener.TransformerROS()
+        # self.conv_mat = a.fromTranslationRotation(trans, rot)
+
+        # ----------------
+        # Get the available facial animations
+        rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_expressions_cb)
+
+        rospy.Subscriber("/blender_api/available_gestures", AvailableGestures, self.get_gestures_cb)
+
+        # Send out facial expressions and gestures.
+        self.expression_pub = rospy.Publisher("/blender_api/set_emotion_state", EmotionState, queue_size=1)
+        self.gesture_pub = rospy.Publisher("/blender_api/set_gesture", SetGesture, queue_size=1)
+        self.soma_pub = rospy.Publisher("/blender_api/set_soma_state", SomaState, queue_size=2)
+        self.blink_pub = rospy.Publisher("/blender_api/set_blink_randomly", BlinkCycle, queue_size=1)
+        self.saccade_pub = rospy.Publisher("/blender_api/set_saccade", SaccadeCycle, queue_size=1)
+
+        # ----------------
+        # XYZ coordinates of where to turn and look.
+        self.turn_pub = rospy.Publisher("/blender_api/set_face_target", Target, queue_size=1)
+
+        self.gaze_pub = rospy.Publisher("/blender_api/set_gaze_target", Target, queue_size=1)
+
+        # Int32 faceid of the face to glence at or turn and face.
+        self.glance_at_pub = rospy.Publisher("/opencog/glance_at", Int32, queue_size=1)
+
+        self.look_at_pub = rospy.Publisher("/opencog/look_at", Int32, queue_size=1)
+
+        self.gaze_at_pub = rospy.Publisher("/opencog/gaze_at", Int32, queue_size=1)
+
+        # ----------------
+        rospy.logwarn("setting up chatbot affect perceive and express links")
+
+        # Publish cues to the chatbot, letting it know what we are doing.
+        self.behavior_pub = rospy.Publisher("robot_behavior", String, queue_size=1)
+
+        # Tell the TTS subsystem what to vocalize
+        # self.tts_pub = rospy.Publisher("tts", String, queue_size=1)
+        # self.tts_pub = rospy.Publisher("/robot/chatbot_responses", String, queue_size=1)
+        self.tts_pub = rospy.Publisher("chatbot_responses", String, queue_size=1)
+
+        # Tell the chatbot what sort of affect to apply during
+        # TTS vocalization. (Huhh???) XXX this needs documentation.
+        self.affect_pub = rospy.Publisher("chatbot_affect_express", String, queue_size=1)
+
+        # Used to stop the vocalization.
+        self.tts_control_pub = rospy.Publisher("tts_control", String, queue_size=1)
+
+        # ----------------
+        # Subscriptions needed for autonomous behaviors.
+        # XXX FIXME both of these should probably be removed.
+        # String text of what the robot heard (from TTS)
+        rospy.Subscriber("chatbot_speech", ChatMessage, self.chat_perceived_text_cb)
+
+        # Chatbot can request blinks correlated with hearing and speaking.
+        rospy.Subscriber("chatbot_blink", String, self.chatbot_blink_cb)
+
+        # ----------------
+        # Boolean flag, turn the behavior tree on and off (set it running,
+        # or stop it)
+        rospy.Subscriber("/behavior_switch", String, self.behavior_switch_callback)
+
+        # Bit-flag to enable/disable publication of various classes of
+        # expressions and gestures.
+        rospy.Subscriber("/behavior_control", Int32, self.behavior_control_callback)
 
     def step(self):
         print("step once")
@@ -322,118 +413,5 @@ class EvaControl:
     # Data is a bit-flag that enables/disables publication of messages.
     def behavior_control_callback(self, data):
         self.control_mode = data.data
-
-    def __init__(self):
-        # Full control by default
-        self.control_mode = 255
-        self.running = True
-
-        # The below will hang until roscore is started!
-        rospy.init_node("OpenCog_Eva")
-        print("Starting OpenCog Behavior Node")
-
-        # ----------------
-        # Obtain the blender-to-camera coordinate-frame conversion
-        # matrix.  XXX FIXME This is some insane hack that does not
-        # make sense.  All 3D coordinates are supposed to be in
-        # head-centered coordinates, bot for the sensory subsystem,
-        # and also for the look-at subsystem. However, someone
-        # screwed something up somewhere, and now we hack around
-        # it here. XXX This is really bad spaghetti-code programming.
-        # Fuck.
-        lstn = tf.TransformListener()
-        try:
-            print("Waiting for the camera-blender transform\n")
-            lstn.waitForTransform('camera', 'blender',
-                                  rospy.Time(0), rospy.Duration(10.0))  # world
-        except Exception:
-            print("No camera transforms!\n")
-            exit(1)
-
-        print("Got the camera-blender transform\n")
-        (trans, rot) = lstn.lookupTransform(
-            'blender', 'camera', rospy.Time(0))
-        a = tf.listener.TransformerROS()
-        self.conv_mat = a.fromTranslationRotation(trans, rot)
-
-        # ----------------
-        # Get the available facial animations
-        rospy.Subscriber("/blender_api/available_emotion_states",
-                         AvailableEmotionStates, self.get_expressions_cb)
-
-        rospy.Subscriber("/blender_api/available_gestures",
-                         AvailableGestures, self.get_gestures_cb)
-
-        # Send out facial expressions and gestures.
-        self.expression_pub = rospy.Publisher("/blender_api/set_emotion_state",
-                                              EmotionState, queue_size=1)
-        self.gesture_pub = rospy.Publisher("/blender_api/set_gesture",
-                                           SetGesture, queue_size=1)
-        self.soma_pub = rospy.Publisher("/blender_api/set_soma_state",
-                                        SomaState, queue_size=2)
-        self.blink_pub = rospy.Publisher("/blender_api/set_blink_randomly",
-                                         BlinkCycle, queue_size=1)
-        self.saccade_pub = rospy.Publisher("/blender_api/set_saccade",
-                                           SaccadeCycle, queue_size=1)
-
-        # ----------------
-        # XYZ coordinates of where to turn and look.
-        self.turn_pub = rospy.Publisher("/blender_api/set_face_target",
-                                        Target, queue_size=1)
-
-        self.gaze_pub = rospy.Publisher("/blender_api/set_gaze_target",
-                                        Target, queue_size=1)
-
-        # Int32 faceid of the face to glence at or turn and face.
-        self.glance_at_pub = rospy.Publisher("/opencog/glance_at",
-                                             Int32, queue_size=1)
-
-        self.look_at_pub = rospy.Publisher("/opencog/look_at",
-                                           Int32, queue_size=1)
-
-        self.gaze_at_pub = rospy.Publisher("/opencog/gaze_at",
-                                           Int32, queue_size=1)
-
-        # ----------------
-        rospy.logwarn("setting up chatbot affect perceive and express links")
-
-        # Publish cues to the chatbot, letting it know what we are doing.
-        self.behavior_pub = rospy.Publisher("robot_behavior",
-                                            String, queue_size=1)
-
-        # Tell the TTS subsystem what to vocalize
-        # self.tts_pub = rospy.Publisher("tts", String, queue_size=1)
-        # self.tts_pub = rospy.Publisher("/robot/chatbot_responses", String, queue_size=1)
-        self.tts_pub = rospy.Publisher("chatbot_responses", String, queue_size=1)
-
-        # Tell the chatbot what sort of affect to apply during
-        # TTS vocalization. (Huhh???) XXX this needs documentation.
-        self.affect_pub = rospy.Publisher("chatbot_affect_express",
-                                          String, queue_size=1)
-
-        # Used to stop the vocalization.
-        self.tts_control_pub = rospy.Publisher("tts_control",
-                                               String, queue_size=1)
-
-        # ----------------
-        # Subscriptions needed for autonomous behaviors.
-        # XXX FIXME both of these should probably be removed.
-        # String text of what the robot heard (from TTS)
-        rospy.Subscriber("chatbot_speech", ChatMessage,
-                         self.chat_perceived_text_cb)
-
-        # Chatbot can request blinks correlated with hearing and speaking.
-        rospy.Subscriber("chatbot_blink", String, self.chatbot_blink_cb)
-
-        # ----------------
-        # Boolean flag, turn the behavior tree on and off (set it running,
-        # or stop it)
-        rospy.Subscriber("/behavior_switch", String,
-                         self.behavior_switch_callback)
-
-        # Bit-flag to enable/disable publication of various classes of
-        # expressions and gestures.
-        rospy.Subscriber("/behavior_control", Int32,
-                         self.behavior_control_callback)
 
 # ----------------------------------------------------------------

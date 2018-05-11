@@ -19,14 +19,14 @@
 # Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from netcat import netcat
+from opencog_bridge.netcat import netcat
 
 
 # The code here is a quick, cheap hack to place information into the
 # cogserver atomspace. It opens a socket to the cogserver, and sends
 # scheme snippets across.  These areu usually some Atomese.
 #
-class AtomicMsgs:
+class PerceptionCtrl:
 
     def __init__(self):
         self.hostname = "localhost"

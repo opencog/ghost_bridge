@@ -7,44 +7,30 @@
 set -e
 _session_name="opencog"
 
-source /opt/hansonrobotics/ros/setup.bash
-
 # hrtool workspace
-HR_WS="$(hr env | grep HR_WORKSPACE | cut -d = -f 2)"
-
-source ${HR_WS}/HEAD/devel/setup.bash # source ROS workspace within HEAD stack
-
-# The HEAD setup has its own python virutal environment thus the need to update
-# the PYTHONPATH
-PYTHON_PATH="${PYTHONPATH}:/usr/local/lib/python2.7/dist-packages"
+HR_WORKSPACE="$(hr env | grep HR_WORKSPACE | cut -d = -f 2)"
 
 # start opencog processes in tmux session.
 start_opencog_tmux_session()
 {
   echo "Start opencog services in a new background tmux session"
+
   # Start relex
   tmux new-session -d -s "$_session_name" -n "relex" \
-    "cd $HR_WS/OpenCog/relex &&
+    "cd $HR_WORKSPACE/OpenCog/relex &&
     bash opencog-server.sh;
     $SHELL"
 
   # Start the cogserver
+  # TODO: catkin_find should be used to find the correct path as this will not work in non dev environments
   tmux new-window -t "$_session_name:" -n "cogserver" \
-    "cd $HR_WS/OpenCog/ros-behavior-scripting/scripts &&
-    guile -l config.scm;
+    "cd $HR_WORKSPACE/HEAD/src/opencog_bridge/scripts &&
+    guile -l load-opencog.scm;
     $SHELL"
 
-  # Start passing sensory inputs to the cogserver
-  tmux new-window -t "$_session_name:" -n "rbs" \
-    "export PYTHONPATH=$PYTHON_PATH &&
-    cd $HR_WS/OpenCog/ros-behavior-scripting/sensors &&
-    python main.py ;
-    $SHELL"
-
-  # Start perception of emotions
-  # TODO: To be integrated into HEAD in v02
-  tmux new-window -t "$_session_name:" -n "perception" \
-    "roslaunch ros_people_model devhead.launch ;
+  # Start opencog_bridge
+  tmux new-window -t "$_session_name:" -n "opencog_bridge" \
+    "roslaunch opencog_bridge run.launch;
     $SHELL"
 
   # Start a shell to cogserver
@@ -58,5 +44,4 @@ start_opencog_tmux_session()
 
 # Start opencog tmux session
 tmux has-session -t "$_session_name" || start_opencog_tmux_session
-
 tmux a -t "$_session_name"

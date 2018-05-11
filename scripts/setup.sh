@@ -13,19 +13,14 @@
 set -e
 GIT_REPO="$(dirname $(readlink -f ${BASH_SOURCE[0]}))/.."
 
-# Install octool
+## Install octool and OpenCog dependencies
 cd "$(dirname "$0")"
 wget http://raw.github.com/opencog/ocpkg/master/ocpkg -O octool && chmod +rx octool && ./octool -h
+./octool -d
 
-# Clone opencog repos.
+## Clone and build OpenCog repos
 hr update opencog
-# Install dependencies of OpenCog
-# ./octool -...
-# Build OpenCog
 hr build opencog
-
-## Configure ros-behavior-scripting for building using `hr build opencog`
-ln -s "$GIT_REPO" "$HR_WS/HEAD/src/ros-behavior-scripting"
 
 ## build ros-behaviour-scripting
 hr build head

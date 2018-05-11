@@ -20,6 +20,8 @@
 
 import socket
 
+import rospy
+
 
 # This implements netcat in python.
 #
@@ -33,11 +35,11 @@ def netcat(hostname, port, content):
     try:
         s.connect((hostname, port))
     except socket.error as msg:
-        print("Connect failed: ", msg)
+        rospy.logerr("Connect failed: %s" % msg)
         s.close()
         return 1  # non-zero means failure
 
-    print("netcat sending: %s" % content)
+    rospy.logdebug("netcat sending: %s" % content)
 
     s.sendall(content)
     s.shutdown(socket.SHUT_WR)
@@ -45,7 +47,8 @@ def netcat(hostname, port, content):
         data = s.recv(1024)
         if not data or data == "":
             break
-    # print("Received:", repr(data)
-    # print("Connection closed."
+
+    rospy.logdebug("Received: %s" % repr(data))
     s.close()
+    rospy.logdebug("Connection closed.")
     return 0  # zero means success

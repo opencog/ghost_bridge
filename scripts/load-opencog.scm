@@ -9,9 +9,11 @@
              (opencog ghost)
              (opencog ghost procedures))
 
+(load "load-actions.scm")
+
 (ecan-based-ghost-rules #t)
 (set-relex-server-host)
-(ghost-run)
+
 
 
 ; (define (single-rule)
@@ -41,6 +43,10 @@
 
 (start-cogserver "opencog.conf")
 (cog-logger-set-stdout! #f)
+
+; load and start the opencog action module
+(use-modules (opencog movement))
+(start-ros-movement-node)
 
 ; Start the ghost loop
 (ghost-run)

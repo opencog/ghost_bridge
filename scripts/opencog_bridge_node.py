@@ -23,24 +23,20 @@
 # is resolved nicely
 import sys
 
-sys.path.append("/opt/hansonrobotics/ros/lib/python2.7/dist-packages/")
+# sys.path.append("/opt/hansonrobotics/ros/lib/python2.7/dist-packages/")
 
-import logging
+
 import rospy
+from opencog_bridge import OpenCogBridge
 
-from rosbridge_googlespeech import GoogleSpeech
-from rosbridge_people_model import PeopleModel
 
-rospy.init_node("OpenCog_ROS_bridge")
-logging.info("Starting the OpenCog ROS Bridge")
-print("Starting the OpenCog ROS Bridge")
+if __name__ == "__main__":
+    rospy.init_node('opencog_bridge')
+    bridge = OpenCogBridge()
 
-googlespeech = GoogleSpeech()
-peoplemodel = PeopleModel()
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException as e:
+        rospy.logerr(e)
 
-try:
-    rospy.spin()
-except rospy.ROSInterruptException as e:
-    print(e)
-
-print("Exit OpenCog ROS bridge")
+    rospy.loginfo("Exit OpenCog bridge")
