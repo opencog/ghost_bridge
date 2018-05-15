@@ -24,13 +24,13 @@ start_opencog_tmux_session()
   # Start the cogserver
   # TODO: catkin_find should be used to find the correct path as this will not work in non dev environments
   tmux new-window -t "$_session_name:" -n "cogserver" \
-    "cd $HR_WORKSPACE/HEAD/src/opencog_bridge/scripts &&
+    "cd $HR_WORKSPACE/HEAD/src/ghost_bridge/scripts &&
     guile -l load-opencog.scm;
     $SHELL"
 
-  # Start opencog_bridge
-  tmux new-window -t "$_session_name:" -n "opencog_bridge" \
-    "roslaunch opencog_bridge run.launch;
+  # Start ghost_bridge
+  tmux new-window -t "$_session_name:" -n "ghost_bridge" \
+    "roslaunch ghost_bridge run.launch;
     $SHELL"
 
   # Start a shell to cogserver

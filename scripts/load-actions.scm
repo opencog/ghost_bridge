@@ -1,10 +1,10 @@
 ;
-; ROS robot movement module.
+; ghost-bridge-action-node module.
 ;
 ; Provides interfaces for making physical movements, and
 ; for saying things.
 
-(define-module (opencog movement))
+(define-module (opencog ghost-bridge-action-node))
 
 (use-modules (opencog) (opencog atom-types) (opencog python))
 
@@ -19,10 +19,8 @@
 ; only the debug interfaces.
 ;
 ;
-(define-public (start-ros-movement-node)
+(define-public (start-ghost-bridge-action-node)
  (python-eval "
-
-
 try:
     import rosgraph
 
@@ -30,7 +28,7 @@ try:
     rosgraph.Master('/rostopic').getPid()
 
     # Exec the action_node
-    exec (open('action_node.py').read())
+    exec(open('action_node.py').read())
     print('Loaded the OpenCog ROS Action API')
 
 except Exception as e:

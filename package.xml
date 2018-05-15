@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>opencog_bridge</name>
+    <name>ghost_bridge</name>
     <version>0.5.0</version>
-    <description>A bridge between OpenCog and ROS</description>
+    <description>A bridge between OpenCog's Ghost scripting language and ROS</description>
 
     <!-- One maintainer tag required, multiple allowed, one person per tag -->
     <!-- Example:  -->
@@ -62,6 +62,7 @@
     <depend>hr_msgs</depend>
     <depend>dynamic_reconfigure</depend>
     <depend>ros_people_model</depend>
+    <depend>topic_tools</depend>
 
     <!-- The export tag contains other, unspecified, tags -->
     <export>

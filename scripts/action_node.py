@@ -26,8 +26,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import rospy
-from opencog_bridge import ActionCtrl
 from opencog.atomspace import TruthValue
+from ghost_bridge import ActionCtrl
 
 # The ROS layer.
 action_ctrl = ActionCtrl()
@@ -38,114 +38,86 @@ action_ctrl = ActionCtrl()
 #
 # Must return TruthValue, since EvaluationLinks expect TruthValues.
 
-def do_wake_up():
-    action_ctrl.wake_up()
-    return TruthValue(1, 1)
 
-
-def do_go_sleep():
-    action_ctrl.go_sleep()
-    return TruthValue(1, 1)
-
-
-def glance_at_face(face_id_node):
-    face_id = int(float(face_id_node.name))
-    print("Python glance at face id", face_id)
-    action_ctrl.glance_at(face_id)
-    return TruthValue(1, 1)
-
-
-def look_at_face(face_id_node):
-    face_id = int(float(face_id_node.name))
-    print("Python look at face id", face_id)
-    action_ctrl.look_at(face_id)
-    return TruthValue(1, 1)
-
-
-def gaze_at_face(face_id_node):
-    face_id = int(float(face_id_node.name))
-    print("Python gaze at face id", face_id)
-    action_ctrl.gaze_at(face_id)
-    return TruthValue(1, 1)
-
-
-def gaze_at_point(x_node, y_node, z_node):
-    x = float(x_node.name)
-    y = float(y_node.name)
-    z = float(z_node.name)
-    action_ctrl.gaze_at_point(x, y, z)
-    return TruthValue(1, 1)
-
-
-def look_at_point(x_node, y_node, z_node):
-    x = float(x_node.name)
-    y = float(y_node.name)
-    z = float(z_node.name)
-    action_ctrl.look_at_point(x, y, z)
-    return TruthValue(1, 1)
-
-
-def do_face_expression(face_expression_node, duration_node, intensity_node):
-    face_expression = face_expression_node.name
-    intensity = float(intensity_node.name)
-    duration = float(duration_node.name)
-    print("Python facial expression: ", face_expression, " for ",
-          duration, " int ", intensity)
-    action_ctrl.expression(face_expression, intensity, duration)
-    return TruthValue(1, 1)
-
-
-def do_gesture(gesture_node, intensity_node, repeat_node, speed_node):
-    gesture = gesture_node.name
-    intensity = float(intensity_node.name)
-    repeat = float(repeat_node.name)
-    speed = float(speed_node.name)
-    print("Python gesture: ", gesture, ", int: ", intensity,
-          ", rep: ", repeat, ", speed: ", speed)
-    action_ctrl.gesture(gesture, intensity, repeat, speed)
-    return TruthValue(1, 1)
-
-
-def publish_behavior(event_node):
-    print("(Behavior event:", event_node.name, ")")
-    action_ctrl.publish_behavior(event_node.name)
-    return TruthValue(1, 1)
-
-
-def explore_saccade():
-    print("Python: Explore Saccade")
-    action_ctrl.explore_saccade()
-    return TruthValue(1, 1)
-
-
-def conversational_saccade():
-    print("Python: Conversational Saccade")
-    action_ctrl.conversational_saccade()
-    return TruthValue(1, 1)
-
-
-def listening_saccade():
-    print("Python: Listening Saccade")
-    action_ctrl.listening_saccade()
-    return TruthValue(1, 1)
-
-
-def blink_rate(mean_node, var_node):
-    mean = float(mean_node.name)
-    var = float(var_node.name)
-    print("Python: blink-rate: ", mean, " variation ", var)
-    action_ctrl.blink_rate(mean, var)
-    return TruthValue(1, 1)
-
-
-def say_text(text_node):
+def say(text_node):
     text = text_node.name
-    action_ctrl.say_text(text)
+    rospy.logdebug("say(text={})".format(text))
+    action_ctrl.say(text)
     return TruthValue(1, 1)
 
 
-# Return true as long as ROS is running.
-def ros_is_running():
-    if rospy.is_shutdown():
-        return TruthValue(0, 1)
+def gaze_at(x_node, y_node, z_node, speed_node):
+    x = float(x_node.name)
+    y = float(y_node.name)
+    z = float(z_node.name)
+    speed = float(speed_node.name)
+    rospy.logdebug("gaze_at(x={}, y={}, z={}, speed={})".format(x, y, z, speed))
+    action_ctrl.gaze_at(x, y, z, speed)
+    return TruthValue(1, 1)
+
+
+def face_toward(x_node, y_node, z_node, speed_node):
+    x = float(x_node.name)
+    y = float(y_node.name)
+    z = float(z_node.name)
+    speed = float(speed_node.name)
+    rospy.logdebug("face_toward(x={}, y={}, z={}, speed={})".format(x, y, z, speed))
+    action_ctrl.face_toward(x, y, z, speed)
+    return TruthValue(1, 1)
+
+
+def blink(mean_node, variation_node):
+    mean = float(mean_node.name)
+    variation = float(variation_node.name)
+    rospy.loginfo("blink(mean={}, variation={})".format(mean, variation))
+    action_ctrl.blink(mean, variation)
+    return TruthValue(1, 1)
+
+
+def saccade(mean_node, variation_node, paint_scale_node, eye_size_node, eye_distance_node, mouth_width_node,
+            mouth_height_node, weight_eyes_node, weight_mouth_node):
+    mean = float(mean_node.name)
+    variation = float(variation_node.name)
+    paint_scale = float(paint_scale_node.name)
+    eye_size = float(eye_size_node.name)
+    eye_distance = float(eye_distance_node.name)
+    mouth_width = float(mouth_width_node.name)
+    mouth_height = float(mouth_height_node.name)
+    weight_eyes = float(weight_eyes_node.name)
+    weight_mouth = float(weight_mouth_node.name)
+    rospy.logdebug("saccade(mean={}, variation={}, paint_scale={}, "
+                   "eye_size={}, eye_distance={}, mouth_width={}, mouth_height={}, "
+                   "weight_eyes={}, weight_mouth={})".format(mean, variation, paint_scale, eye_size, eye_distance,
+                                                             mouth_width, mouth_height, weight_eyes, weight_mouth))
+    action_ctrl.saccade(mean, variation, paint_scale, eye_size, eye_distance, mouth_width, mouth_height, weight_eyes,
+                        weight_mouth)
+    return TruthValue(1, 1)
+
+
+def emote(name_node, magnitude_node, duration_node):
+    name = name_node.name
+    magnitude = float(magnitude_node.name)
+    duration = float(duration_node.name)
+    rospy.logdebug("emote(name={}, magnitude={}, duration={})".format(name, magnitude, duration))
+    action_ctrl.emote(name, magnitude, duration)
+    return TruthValue(1, 1)
+
+
+def gesture(name_node, speed_node, magnitude_node, repeat_node):
+    name = name_node.name
+    speed = float(speed_node.name)
+    magnitude = float(magnitude_node.name)
+    repeat = int(float(repeat_node.name))
+    rospy.logdebug("gesture(name={}, speed={}, magnitude={}, repeat={})".format(name, speed, magnitude, repeat))
+    action_ctrl.gesture(name, speed, magnitude, repeat)
+    return TruthValue(1, 1)
+
+
+def soma(name_node, magnitude_node, rate_node, ease_in_node):
+    name = name_node.name
+    magnitude = float(magnitude_node.name)
+    rate = float(rate_node.name)
+    ease_in = float(ease_in_node.name)
+    rospy.logdebug("soma(name={}, magnitude={}, rate={}, ease_in={})".format(name, magnitude, rate, ease_in))
+    action_ctrl.soma(name, magnitude, rate, ease_in)
     return TruthValue(1, 1)

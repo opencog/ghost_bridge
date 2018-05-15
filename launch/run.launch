@@ -1,5 +1,6 @@
 <launch>
     <include file="$(find ros_people_model)/launch/devhead.launch" />
     <param name="robot_name" value="sophia4"/>
-    <node name="opencog_bridge" pkg="opencog_bridge" type="opencog_bridge_node.py" />
+    <node name="faces_throttler" type="throttle" pkg="topic_tools" args="messages /faces 2 /faces_throttled" />
+    <node name="ghost_bridge" pkg="ghost_bridge" type="ghost_bridge_node.py" />
 </launch>

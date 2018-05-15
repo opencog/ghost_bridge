@@ -27,11 +27,11 @@ import sys
 
 
 import rospy
-from opencog_bridge import OpenCogBridge
+from ghost_bridge import OpenCogBridge
 
 
 if __name__ == "__main__":
-    rospy.init_node('opencog_bridge')
+    rospy.init_node('ghost_bridge', log_level=rospy.DEBUG)
     bridge = OpenCogBridge()
 
     try:

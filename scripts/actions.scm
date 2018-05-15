@@ -1,205 +1,249 @@
 ;
-; do-movement.scm
+; actions.scm
 ;
-; Implement the movement API for ROS/blender animations.
+; Implement the Ghost action API for ROS
 ;
 
+; -------------------------------------------------------------
 ; Delete the current definition, if any.
-(define (delete-definition STR)
-	(define dfn
-		(cog-get-link 'DefineLink 'DefinedPredicateNode
-			(DefinedPredicate STR)))
+;
 
-	(if (not (null? dfn)) (cog-delete (car dfn)) #f))
+(define (delete-definition STR)
+ (define dfn
+  (cog-get-link 'DefineLink 'DefinedPredicateNode
+   (DefinedPredicate STR)))
+
+ (if (not (null? dfn)) (cog-delete (car dfn)) #f))
+
+
+; -------------------------------------------------------------
+; Action name definitions
+;
+
+(define say "say")
+(define gaze-at "gaze-at")
+(define face-toward "face-toward")
+(define blink "blink")
+(define saccade "saccade")
+(define emote "emote")
+(define gesture "gesture")
+(define soma "soma")
+
+; -------------------------------------------------------------
+; Say something.
+;
+; Example usage:
+;   (cog-evaluate! (Put (DefinedPredicate "say") (Node "this is a test")))
+;
+
+(delete-definition say)
+(DefineLink
+ (DefinedPredicate say)
+ (LambdaLink (Variable "text")
+  (Evaluation
+   (GroundedPredicate "py:say")
+   (List (Variable "text")))
+ ))
+
+
+;---------------------------------------------------------------
+; Request robot to point its eyes at a specific point
+;
+; Example usage:
+;   (cog-evaluate! (Put (DefinedPredicate "gaze-at") (List (Number 1.3) (Number 1.2) (Number 1.1) (Number 0.5))))
+;
+
+(delete-definition gaze-at)
+(DefineLink
+ (DefinedPredicate gaze-at)
+ (LambdaLink
+  (VariableList
+   (Variable "$x")
+   (Variable "$y")
+   (Variable "$z")
+   (Variable "$speed"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:gaze_at")
+    (ListLink
+     (Variable "$x")
+     (Variable "$y")
+     (Variable "$z")
+     (Variable "$speed")))
+  )))
+
+
+;---------------------------------------------------------------
+; Request robot to turn its face toward a specific point
+;
+; Example usage:
+;   (cog-evaluate! (Put (DefinedPredicate "face-toward") (List (Number 1.3) (Number 1.2) (Number 1.1) (Number 0.5))))
+;
+
+(delete-definition face-toward)
+(DefineLink
+ (DefinedPredicate face-toward)
+ (LambdaLink
+  (VariableList
+   (Variable "$x")
+   (Variable "$y")
+   (Variable "$z")
+   (Variable "$speed"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:face_toward")
+    (ListLink
+     (Variable "$x")
+     (Variable "$y")
+     (Variable "$z")
+     (Variable "$speed")))
+  )))
+
 
 ; -------------------------------------------------------------
 ; Request a display of a facial expression (smile, frown, etc.)
-; The expression name should be one of the supported blender animations.
+; The expression type should be one of the supported blender animations.
 ;
 ; Example usage:
-;    (cog-evaluate! (Put (DefinedPredicate "Show facial expression")
-;         (ListLink (Concept "happy") (Number 6) (Number 0.6))))
+;   (cog-evaluate! (Put (DefinedPredicate "blink") (List (Number 5.5) (Number 1.5))))
 ;
-(delete-definition "Do show facial expression")
+
+(delete-definition blink)
 (DefineLink
-	(DefinedPredicate "Do show facial expression")
-	(LambdaLink
-		(VariableList
-			(Variable "$expr")
-			(Variable "$duration")
-			(Variable "$intensity"))
-		(SequentialAndLink
-			(EvaluationLink (GroundedPredicate "py:do_face_expression")
-				(ListLink
-					(Variable "$expr")
-					(Variable "$duration")
-					(Variable "$intensity")))
-		)))
+ (DefinedPredicate blink)
+ (LambdaLink
+  (VariableList
+   (Variable "$mean")
+   (Variable "$variation"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:blink")
+    (ListLink
+     (Variable "$mean")
+     (Variable "$variation")))
+  )))
+
+
+; -------------------------------------------------------------
+; Request a display of a facial expression (smile, frown, etc.)
+; The expression type should be one of the supported blender animations.
+;
+; Example usage:
+;    (cog-evaluate! (Put (DefinedPredicate "saccade")
+;         (List
+;           (Number 0.8)
+;           (Number 0.3)
+;           (Number 0.3)
+;           (Number 15.0)
+;           (Number 100.0)
+;           (Number 90.0)
+;           (Number 27.0)
+;           (Number 0.8)
+;           (Number 0.2)
+;         )
+;    ))
+
+(delete-definition saccade)
+(DefineLink
+ (DefinedPredicate saccade)
+ (LambdaLink
+  (VariableList
+   (Variable "$mean")
+   (Variable "$variation")
+   (Variable "$paint_scale")
+   (Variable "$eye_size")
+   (Variable "$eye_distance")
+   (Variable "$mouth_width")
+   (Variable "$mouth_height")
+   (Variable "$weight_eyes")
+   (Variable "$weight_mouth"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:saccade")
+    (ListLink
+     (Variable "$mean")
+     (Variable "$variation")
+     (Variable "$paint_scale")
+     (Variable "$eye_size")
+     (Variable "$eye_distance")
+     (Variable "$mouth_width")
+     (Variable "$mouth_height")
+     (Variable "$weight_eyes")
+     (Variable "$weight_mouth")))
+  )))
+
+
+; -------------------------------------------------------------
+; Request a display of an emotion (smile, frown, etc.)
+; The expression type should be one of the supported blender animations.
+;
+; Example usage:
+;   (cog-evaluate! (Put (DefinedPredicate "emote") (List (Concept "happy") (Number 0.6) (Number 2.0))))
+;
+
+(delete-definition emote)
+(DefineLink
+ (DefinedPredicate emote)
+ (LambdaLink
+  (VariableList
+   (Variable "$name")
+   (Variable "$magnitude")
+   (Variable "$duration"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:emote")
+    (ListLink
+     (Variable "$name")
+     (Variable "$magnitude")
+     (Variable "$duration")))
+  )))
+
 
 ; -------------------------------------------------------------
 ; Request a display of a facial gesture (blink, nod, etc.)
 ; The expression name should be one of the supported blender animations.
 ;
 ; Example usage:
-;    (cog-evaluate! (Put (DefinedPredicate "Show gesture")
-;         (ListLink (Concept "blink") (Number 0.8) (Number 3) (Number 1))))
+;   (cog-evaluate! (Put (DefinedPredicate "gesture") (List (Concept "blink") (Number 3) (Number 0.8) (Number 1))))
 ;
-(delete-definition "Do show gesture")
+
+(delete-definition gesture)
 (DefineLink
-	(DefinedPredicate "Do show gesture")
-	(LambdaLink
-		(VariableList
-			(Variable "$gest")
-			(Variable "$insensity")
-			(Variable "$repeat")
-			(Variable "$speed"))
-		(SequentialAndLink
-			;; Send it off to ROS to actually do it.
-			(EvaluationLink (GroundedPredicate "py:do_gesture")
-				(ListLink
-					(Variable "$gest")
-					(Variable "$insensity")
-					(Variable "$repeat")
-					(Variable "$speed")))
-		)))
+ (DefinedPredicate gesture)
+ (LambdaLink
+  (VariableList
+   (Variable "$name")
+   (Variable "$speed")
+   (Variable "$magnitude")
+   (Variable "$repeat"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:gesture")
+    (ListLink
+     (Variable "$name")
+     (Variable "$speed")
+     (Variable "$magnitude")
+     (Variable "$repeat")))
+  )))
+
 
 ; -------------------------------------------------------------
-; Eye-saccade control.
-; (cog-evaluate! (Put (DefinedPredicate "Say") (Node "this is a test"))))
-
-(delete-definition "Conversational Saccade")
-(delete-definition "Listening Saccade")
-(delete-definition "Explore Saccade")
-
-(DefineLink
-	(DefinedPredicate "Conversational Saccade")
-	(LambdaLink
-		(Evaluation
-			(GroundedPredicate "py: conversational_saccade")
-			(List))
-	))
-
-(DefineLink
-	(DefinedPredicate "Listening Saccade")
-	(LambdaLink
-		(Evaluation
-			(GroundedPredicate "py: listening_saccade")
-			(List))
-	))
-
-(DefineLink
-	(DefinedPredicate "Explore Saccade")
-	(LambdaLink
-		(Evaluation
-			(GroundedPredicate "py: explore_saccade")
-			(List))
-	))
-
-; -------------------------------------------------------------
-; Control the blink rate of the robot.
-
-(delete-definition "Blink rate")
-(DefineLink
-	(DefinedPredicate "Blink rate")
-	(LambdaLink
-		(VariableList (Variable "$mean") (Variable "$var"))
-		(SequentialAndLink
-			;; Send it off to ROS to actually do it.
-			(EvaluationLink (GroundedPredicate "py: blink_rate")
-				(ListLink (Variable "$mean") (Variable "$var")))
-		)))
-
-; -------------------------------------------------------------
-; Request robot to look at a specific coordinate point.
-; Currently, a very thin wrapper around py:look_at_point
-
-(delete-definition "Do look at point")
-(DefineLink
-	(DefinedPredicate "Do look at point")
-	(LambdaLink
-		(VariableList (Variable "$x") (Variable "$y") (Variable "$z"))
-		(SequentialAndLink
-			;; Send it off to ROS to actually do it.
-			(EvaluationLink (GroundedPredicate "py:look_at_point")
-				(ListLink (Variable "$x") (Variable "$y") (Variable "$z")))
-		)))
-
-;---------------------------------------------------------------
-
-; Request robot to turn eyes at a specific coordinate point.
-; Currently, a very thin wrapper around py:gaze_at_point
-
-(delete-definition "Do gaze at point")
-(DefineLink
-	(DefinedPredicate "Do gaze at point")
-	(LambdaLink
-		(VariableList (Variable "$x") (Variable "$y") (Variable "$z"))
-		(SequentialAndLink
-			;; Log the time.
-			; (True (DefinedSchema "set gesture timestamp"))
-			;; Send it off to ROS to actually do it.
-			(EvaluationLink (GroundedPredicate "py:gaze_at_point")
-				(ListLink (Variable "$x") (Variable "$y") (Variable "$z")))
-		)))
-
-; -------------------------------------------------------------
-; Publish the current behavior.
-; Cheap hack to allow external ROS nodes to know what we are doing.
-; The string name of the node is sent directly as a ROS String message
-; to the "robot_behavior" topic.
+; Request a display of a soma state
 ;
 ; Example usage:
-;    (cog-evaluate! (Put (DefinedPredicate "Publish behavior")
-;         (ListLink (Concept "foobar joke"))))
+;   (cog-evaluate! (Put (DefinedPredicate "soma") (List (Concept "normal") (Number 0.1) (Number 1) (Number 3))))
 ;
-(delete-definition "Publish behavior")
+
+(delete-definition soma)
 (DefineLink
-	(DefinedPredicate "Publish behavior")
-	(LambdaLink
-		(VariableList (Variable "$bhv"))
-		;; Send it off to ROS to actually do it.
-		(EvaluationLink (GroundedPredicate "py: publish_behavior")
-			(ListLink (Variable "$bhv")))
-		))
+ (DefinedPredicate soma)
+ (LambdaLink
+  (VariableList
+   (Variable "$name")
+   (Variable "$magnitude")
+   (Variable "$rate")
+   (Variable "$ease_in"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:soma")
+    (ListLink
+     (Variable "$name")
+     (Variable "$magnitude")
+     (Variable "$rate")
+     (Variable "$ease_in")))
+  )))
 
-; -------------------------------------------------------------
-
-; Call once, to fall asleep.
-(delete-definition "Do go to sleep")
-(DefineLink
-	(DefinedPredicate "Do go to sleep")
-	; Play the go-to-sleep animation.
-	(Evaluation (GroundedPredicate "py:do_go_sleep") (ListLink))
-)
-
-; Wake-up sequence
-(delete-definition "Do wake up")
-(DefineLink
-	(DefinedPredicate "Do wake up")
-
-	; Run the wake animation.
-	(Evaluation (GroundedPredicate "py:do_wake_up") (ListLink))
-)
-
-; -------------------------------------------------------------
-; Say something. To test run,
-; (cog-evaluate! (Put (DefinedPredicate "Say") (Node "this is a test"))))
-(delete-definition "Say")
-(DefineLink
-	(DefinedPredicate "Say")
-	(LambdaLink (Variable "sentence")
-		(Evaluation
-			(GroundedPredicate "py: say_text")
-			(List (Variable "sentence")))
-	))
-
-; -------------------------------------------------------------
-; Return true if ROS is still running.
-(delete-definition "ROS is running?")
-(DefineLink
-	(DefinedPredicate "ROS is running?")
-	(Evaluation
-		(GroundedPredicate "py:ros_is_running") (ListLink)))
-
-; -------------------------------------------------------------
-*unspecified*  ; Make the load be silent
+*unspecified* ; Make the load be silent

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(opencog_bridge)
+project(ghost_bridge)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   hr_msgs
   ros_people_model
+  topic_tools
 )
 
 ## System dependencies are found with CMake's conventions
@@ -165,14 +166,12 @@ include_directories(
 install(PROGRAMS
   scripts/run.sh
   scripts/action_node.py
-  scripts/psi_node.py
-  scripts/opencog_bridge_node.py
+  scripts/ghost_bridge_node.py
   scripts/actions.scm
   scripts/load-actions.scm
   scripts/load-opencog.scm
   scripts/opencog.conf
-  scripts/psi.scm
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/scripts
 )
 
 ## Mark executables and/or libraries for installation
@@ -192,7 +191,7 @@ install(PROGRAMS
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
   launch/run.launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
 
 #############
