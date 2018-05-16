@@ -199,7 +199,7 @@
 ; The expression name should be one of the supported blender animations.
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "gesture") (List (Concept "blink") (Number 3) (Number 0.8) (Number 1))))
+;   (cog-evaluate! (Put (DefinedPredicate "gesture") (List (Concept "025_noddingHappy") (Number 3) (Number 0.8) (Number 1))))
 ;
 
 (delete-definition gesture)
@@ -226,6 +226,7 @@
 ;
 ; Example usage:
 ;   (cog-evaluate! (Put (DefinedPredicate "soma") (List (Concept "normal") (Number 0.1) (Number 1) (Number 3))))
+;   (cog-evaluate! (Put (DefinedPredicate "soma") (List (Concept "sleep") (Number 1) (Number 1) (Number 3))))
 ;
 
 (delete-definition soma)
