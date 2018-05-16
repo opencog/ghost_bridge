@@ -19,24 +19,21 @@
 # Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-# XXX To be removed when https://github.com/hansonrobotics/HEAD/issues/618
-# is resolved nicely
-import sys
-
-# sys.path.append("/opt/hansonrobotics/ros/lib/python2.7/dist-packages/")
-
 
 import rospy
-from ghost_bridge import OpenCogBridge
+from ghost_bridge import GhostBridge
 
 
 if __name__ == "__main__":
     rospy.init_node('ghost_bridge', log_level=rospy.DEBUG)
-    bridge = OpenCogBridge()
+    bridge = GhostBridge()
+    rate = rospy.Rate(0.1)
 
-    try:
-        rospy.spin()
-    except rospy.ROSInterruptException as e:
-        rospy.logerr(e)
+    while not rospy.is_shutdown():
+        rospy.logdebug("update head parameters")
+        bridge.update_chatbot_params()
+        bridge.update_speech_recogniser_params()
+        rospy.logdebug("updated head parameters")
+        rate.sleep()
 
-    rospy.loginfo("Exit OpenCog bridge")
+    rospy.loginfo("Exit ghost_bridge")

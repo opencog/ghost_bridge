@@ -3,6 +3,7 @@ from hr_msgs.msg import ChatMessage
 from ghost_bridge.perception_ctrl import PerceptionCtrl
 from ros_people_model.msg import Faces
 from ghost_bridge.netcat import netcat
+import dynamic_reconfigure.client
 
 
 class GhostBridge:
@@ -42,6 +43,14 @@ class GhostBridge:
         rospy.loginfo("Starting agents")
         netcat(self.hostname, self.port, GhostBridge.START_AGENTS_CMD)
         rospy.loginfo("Starting agents finished")
+
+    def update_speech_recogniser_params(self):
+        client = dynamic_reconfigure.client.Client("/{}/speech_recognizer".format(self.robot_name))
+        client.update_configuration({'enable': True, 'continous': True})
+
+    def update_chatbot_params(self):
+        client = dynamic_reconfigure.client.Client("/{}/chatbot".format(self.robot_name))
+        client.update_configuration({'mute': True})
 
     def perceived_word(self, msg):
         self.perception_ctrl.perceive_word(self.face_id, msg.utterance)
