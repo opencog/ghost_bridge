@@ -164,6 +164,7 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
+  scripts/stop.sh
   scripts/run.sh
   scripts/action_node.py
   scripts/ghost_bridge_node.py
