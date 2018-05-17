@@ -43,7 +43,7 @@ class PerceptionCtrl:
         :return: None
         """
 
-        content = '(perceive-face "{}" {} {} {} {})\n'.format(face_id, x, y, z, confidence)
+        content = '(perceive-face "{}" {})\n'.format(face_id, confidence)
         netcat(self.hostname, self.port, content)
 
     def perceive_emotion(self, face_id, emotion_id, confidence):
@@ -67,7 +67,7 @@ class PerceptionCtrl:
         :return: None
         """
 
-        content = '(perceive-eye-state "{}" {} {})\n'.format(face_id, eye_id, state)
+        content = '(perceive-eye-state "{}" "{}" {})\n'.format(face_id, eye_id, state)
         netcat(self.hostname, self.port, content)
 
     def perceive_face_talking(self, face_id, confidence):
