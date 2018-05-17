@@ -19,7 +19,6 @@
 # Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
 import rospy
 from ghost_bridge import GhostBridge
 
@@ -27,13 +26,10 @@ from ghost_bridge import GhostBridge
 if __name__ == "__main__":
     rospy.init_node('ghost_bridge', log_level=rospy.DEBUG)
     bridge = GhostBridge()
-    rate = rospy.Rate(0.1)
 
-    while not rospy.is_shutdown():
-        rospy.logdebug("update head parameters")
-        bridge.update_chatbot_params()
-        bridge.update_speech_recogniser_params()
-        rospy.logdebug("updated head parameters")
-        rate.sleep()
+    try:
+        rospy.spin()
+    except rospy.ROSInterruptException as e:
+        rospy.logerr(e)
 
-    rospy.loginfo("Exit ghost_bridge")
+    rospy.loginfo("Exit OpenCog bridge")
