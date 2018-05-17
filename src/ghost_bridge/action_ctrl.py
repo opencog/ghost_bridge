@@ -81,7 +81,7 @@ class ActionCtrl:
         self.gaze_target_pub = rospy.Publisher("/blender_api/set_gaze_target", Target, queue_size=1)
 
         # Text to speech publisher
-        self.tts_pub = rospy.Publisher("chatbot_responses", String, queue_size=1)
+        self.ghost_tts_pub = rospy.Publisher("/ghost_bridge/say", String, queue_size=1)
 
         # Subscribers to get the available emotions and gestures
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
@@ -111,7 +111,7 @@ class ActionCtrl:
         :return: None
         """
 
-        self.tts_pub.publish(text)
+        self.ghost_tts_pub.publish(text)
         rospy.logdebug("published say(text={})".format(text))
 
     def gaze_at(self, x, y, z, speed):
