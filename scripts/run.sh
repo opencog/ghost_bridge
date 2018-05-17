@@ -39,6 +39,11 @@ start_opencog_tmux_session()
     rlwrap telnet localhost 17001;
     $SHELL"
 
+  # Start bash
+  tmux new-window -t "$_session_name" -n "bash" \
+    "bash;
+    $SHELL"
+
   echo "Finished starting opencog services in a new background tmux session"
 }
 
