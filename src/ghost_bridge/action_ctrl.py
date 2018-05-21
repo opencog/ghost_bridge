@@ -30,6 +30,7 @@ from blender_api_msgs.msg import SetGesture
 from blender_api_msgs.msg import SomaState
 from blender_api_msgs.msg import Target
 from std_msgs.msg import String
+from hr_msgs.msg import TTS
 
 logger = logging.getLogger('hr.ghost_bridge_actions')
 
@@ -81,7 +82,7 @@ class ActionCtrl:
         self.gaze_target_pub = rospy.Publisher("/blender_api/set_gaze_target", Target, queue_size=1)
 
         # Text to speech publisher
-        self.tts_pub = rospy.Publisher("chatbot_responses", String, queue_size=1)
+        self.tts_pub = rospy.Publisher("/sophia4/tts", TTS, queue_size=1)
 
         # Subscribers to get the available emotions and gestures
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
@@ -110,8 +111,11 @@ class ActionCtrl:
         :param text: the text to vocalize
         :return: None
         """
+	msg = TTS()
+	msg.text = text
+	msg.lang = "en-US"
 
-        self.tts_pub.publish(text)
+        self.tts_pub.publish(msg)
         rospy.logdebug("published say(text={})".format(text))
 
     def gaze_at(self, x, y, z, speed):

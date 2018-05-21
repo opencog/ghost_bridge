@@ -39,7 +39,7 @@ def netcat(hostname, port, content):
         s.close()
         return 1  # non-zero means failure
 
-    rospy.logdebug("netcat sending: %s" % content)
+    print("netcat sending: %s" % content)
 
     s.sendall(content)
     s.shutdown(socket.SHUT_WR)

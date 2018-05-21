@@ -89,7 +89,7 @@ class PerceptionCtrl:
         :return: None
         """
 
-        content = "(perceive-word {} {})\n".format(face_id, word)
+        content = "(perceive-word \"{}\")\n".format(word)
         netcat(self.hostname, self.port, content)
 
     def perceive_sentence(self, face_id, sentence):
@@ -100,5 +100,5 @@ class PerceptionCtrl:
         :return: None
         """
 
-        content = "(ghost {} {})\n".format(face_id, sentence)
+        content = "(ghost \"{}\")\n".format(sentence)
         netcat(self.hostname, self.port, content)

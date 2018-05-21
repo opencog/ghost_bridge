@@ -20,7 +20,7 @@
 ; Action name definitions
 ;
 
-(define say "say")
+(define say "Say")
 (define gaze-at "gaze-at")
 (define face-toward "face-toward")
 (define blink "blink")

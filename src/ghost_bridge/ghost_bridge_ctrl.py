@@ -43,18 +43,18 @@ class OpenCogBridge:
         rospy.Subscriber(self.robot_name + "/speech", ChatMessage, self.perceived_sentence)
         rospy.Subscriber('/faces_throttled', Faces, self.faces_cb)
 
-        self.start_agents()
+        #self.start_agents()
 
     def start_agents(self):
         netcat(self.hostname, self.port, OpenCogBridge.START_AGENTS_CMD)
 
     def perceived_word(self, msg):
         self.perception_ctrl.perceive_word(self.face_id, msg.utterance)
-        self.perception_ctrl.perceive_face_talking(self.face_id, 1.0)
+        #self.perception_ctrl.perceive_face_talking(self.face_id, 1.0)
 
     def perceived_sentence(self, msg):
-        self.perception_ctrl.perceive_sentence(msg.utterance)
-        self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
+        self.perception_ctrl.perceive_sentence(self.face_id, msg.utterance)
+        #self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
 
     def faces_cb(self, data):
         for face in data.faces:
