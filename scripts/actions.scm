@@ -20,6 +20,7 @@
 ; Action name definitions
 ;
 
+
 (define say "say")
 (define gaze-at "gaze-at")
 (define face-toward "face-toward")
@@ -29,21 +30,28 @@
 (define gesture "gesture")
 (define soma "soma")
 
+
 ; -------------------------------------------------------------
 ; Say something.
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "say") (Node "this is a test")))
+;   (cog-evaluate! (Put (DefinedPredicate "say") (List (Concept "this is a test") (Concept ""))))
+;   (cog-evaluate! (Put (DefinedPredicate "say") (List (Concept "") (Concept "chatscript"))))
 ;
 
 (delete-definition say)
 (DefineLink
  (DefinedPredicate say)
- (LambdaLink (Variable "text")
-  (Evaluation
-   (GroundedPredicate "py:say")
-   (List (Variable "text")))
- ))
+ (LambdaLink
+  (VariableList
+   (Variable "$text")
+   (Variable "$fallback_id"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:say")
+    (ListLink
+     (Variable "$text")
+     (Variable "$fallback_id")))
+  )))
 
 
 ;---------------------------------------------------------------
@@ -246,5 +254,6 @@
      (Variable "$rate")
      (Variable "$ease_in")))
   )))
+
 
 *unspecified* ; Make the load be silent

@@ -29,7 +29,7 @@ from blender_api_msgs.msg import SaccadeCycle
 from blender_api_msgs.msg import SetGesture
 from blender_api_msgs.msg import SomaState
 from blender_api_msgs.msg import Target
-from std_msgs.msg import String
+from ghost_bridge.msg import GhostSay
 
 logger = logging.getLogger('hr.ghost_bridge_actions')
 
@@ -81,7 +81,7 @@ class ActionCtrl:
         self.gaze_target_pub = rospy.Publisher("/blender_api/set_gaze_target", Target, queue_size=1)
 
         # Text to speech publisher
-        self.ghost_tts_pub = rospy.Publisher("/ghost_bridge/say", String, queue_size=1)
+        self.ghost_tts_pub = rospy.Publisher("/ghost_bridge/say", GhostSay, queue_size=1)
 
         # Subscribers to get the available emotions and gestures
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
@@ -104,15 +104,19 @@ class ActionCtrl:
 
         return self.conv_mat
 
-    def say(self, text):
+    def say(self, text, fallback_id):
         """ Make the robot vocalize text
 
-        :param text: the text to vocalize
+        :param str text: the text to vocalize
+        :param str fallback_id: the id of the engine to fallback too
         :return: None
         """
+        msg = GhostSay()
+        msg.text = text
+        msg.fallback_id = fallback_id
 
-        self.ghost_tts_pub.publish(text)
-        rospy.logdebug("published say(text={})".format(text))
+        self.ghost_tts_pub.publish(msg)
+        rospy.logdebug("published say(text={}, fallback={})".format(text, fallback_id))
 
     def gaze_at(self, x, y, z, speed):
         """  Turn the robot's eyes towards the given target point

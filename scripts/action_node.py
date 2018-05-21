@@ -39,10 +39,11 @@ action_ctrl = ActionCtrl()
 # Must return TruthValue, since EvaluationLinks expect TruthValues.
 
 
-def say(text_node):
+def say(text_node, fallback_id_node):
     text = text_node.name
-    rospy.logdebug("say(text={})".format(text))
-    action_ctrl.say(text)
+    fallback_id = fallback_id_node.name
+    rospy.logdebug("say(text='{}', fallback_id='{}')".format(text, fallback_id))
+    action_ctrl.say(text, fallback_id)
     return TruthValue(1, 1)
 
 
@@ -98,7 +99,7 @@ def emote(name_node, magnitude_node, duration_node):
     name = name_node.name
     magnitude = float(magnitude_node.name)
     duration = float(duration_node.name)
-    rospy.logdebug("emote(name={}, magnitude={}, duration={})".format(name, magnitude, duration))
+    rospy.logdebug("emote(name='{}', magnitude={}, duration={})".format(name, magnitude, duration))
     action_ctrl.emote(name, magnitude, duration)
     return TruthValue(1, 1)
 
@@ -108,7 +109,7 @@ def gesture(name_node, speed_node, magnitude_node, repeat_node):
     speed = float(speed_node.name)
     magnitude = float(magnitude_node.name)
     repeat = int(float(repeat_node.name))
-    rospy.logdebug("gesture(name={}, speed={}, magnitude={}, repeat={})".format(name, speed, magnitude, repeat))
+    rospy.logdebug("gesture(name='{}', speed={}, magnitude={}, repeat={})".format(name, speed, magnitude, repeat))
     action_ctrl.gesture(name, speed, magnitude, repeat)
     return TruthValue(1, 1)
 
@@ -118,6 +119,6 @@ def soma(name_node, magnitude_node, rate_node, ease_in_node):
     magnitude = float(magnitude_node.name)
     rate = float(rate_node.name)
     ease_in = float(ease_in_node.name)
-    rospy.logdebug("soma(name={}, magnitude={}, rate={}, ease_in={})".format(name, magnitude, rate, ease_in))
+    rospy.logdebug("soma(name='{}', magnitude={}, rate={}, ease_in={})".format(name, magnitude, rate, ease_in))
     action_ctrl.soma(name, magnitude, rate, ease_in)
     return TruthValue(1, 1)

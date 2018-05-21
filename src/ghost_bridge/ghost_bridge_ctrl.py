@@ -7,7 +7,7 @@ from ghost_bridge.perception_ctrl import PerceptionCtrl
 from hr_msgs.msg import ChatMessage
 from hr_msgs.msg import TTS
 from ros_people_model.msg import Faces
-from std_msgs.msg import String
+from ghost_bridge.msg import GhostSay
 
 
 class GhostBridge:
@@ -35,18 +35,14 @@ class GhostBridge:
 
         self.perception_ctrl = PerceptionCtrl(self.hostname, self.port)
         self.robot_name = rospy.get_param("robot_name")
-        self.face_id = ''
-        self.last_sentence_time = time.time()
-        self.cs_fallback_timeout = rospy.get_param("ghost_timeout", 3)  # time in seconds
-        self.cs_fallback_timer = None
-        self.cs_fallback_text = None
+        self.face_id = ""
+        self.cs_fallback_text = ""
         self.tts_lock = Lock()
-        self.start_time = None
 
         self.start_agents()
 
         self.tts_pub = rospy.Publisher(self.robot_name + "/tts", TTS, queue_size=1)
-        rospy.Subscriber('/ghost_bridge/say', String, self.ghost_say_cb)
+        rospy.Subscriber('/ghost_bridge/say', GhostSay, self.ghost_say_cb)
         rospy.Subscriber(self.robot_name + "/chatbot_responses", TTS, self.cs_say_cb)
         rospy.Subscriber(self.robot_name + "/words", ChatMessage, self.perceive_word_cb)
         rospy.Subscriber(self.robot_name + "/speech", ChatMessage, self.perceive_sentence_cb)
@@ -59,30 +55,26 @@ class GhostBridge:
 
     def cs_say_cb(self, msg):
         with self.tts_lock:
+            rospy.logdebug("cs_fallback_text: '{}'".format(msg.text))
             self.cs_fallback_text = msg.text
 
     def ghost_say_cb(self, msg):
-        with self.tts_lock:
-            if self.cs_fallback_timer:
-                self.cs_fallback_timer.shutdown()
-                self.cs_fallback_timer = None
-            self.cs_fallback_text = None
-            self.publish_tts(msg.data)
+        rospy.logdebug("ghost_say_cb: '{}', '{}'".format(msg.text, msg.fallback_id))
 
-    def cs_fallback_cb(self, event):
-        rospy.logdebug("cs_fallback_cb")
         with self.tts_lock:
-            if self.cs_fallback_text is not None:
+            if msg.fallback_id == "chatscript":
+                if self.cs_fallback_text == '':
+                    rospy.logwarn("cs_fallback_text is ''")
                 self.publish_tts(self.cs_fallback_text)
-                self.cs_fallback_text = None
             else:
-                rospy.logwarn("cs_fallback_text is None")
+                self.publish_tts(msg.text)
 
     def publish_tts(self, text):
         msg = TTS()
         msg.text = text
         msg.lang = 'en-US'
         self.tts_pub.publish(msg)
+        rospy.logdebug("published tts: '{}', '{}'".format(msg.text, msg.lang))
 
     def perceive_word_cb(self, msg):
         self.perception_ctrl.perceive_word(self.face_id, msg.utterance)
@@ -91,10 +83,6 @@ class GhostBridge:
     def perceive_sentence_cb(self, msg):
         self.perception_ctrl.perceive_sentence(self.face_id, msg.utterance)
         self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
-
-        with self.tts_lock:
-            self.cs_fallback_timer = rospy.Timer(rospy.Duration(self.cs_fallback_timeout), self.cs_fallback_cb,
-                                                 oneshot=True)
 
     def faces_cb(self, data):
         for face in data.faces:
