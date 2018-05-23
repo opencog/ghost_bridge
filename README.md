@@ -23,26 +23,101 @@ Atomspace, an overview of the actions and perceptions are provided below.
 
 Setup
 -------
-TODO: this needs testing
+Follow the steps below to setup the ghost_bridge stack.
 
-Initial setup, only needed to be run once:
+#### 1. Setup HEAD stack
+Setup the Hanson Robotics head stack by following [these instructions](https://github.com/hansonrobotics/hrtool).
+
+#### 2. Configure ~/.bashrc
+Add the following to your ~/.bashrc, 
 ```bash
-rosrun ghost_bridge setup.sh
+source /opt/ros/kinetic/setup.bash
+export HR_WORKSPACE="$(hr env | grep HR_WORKSPACE | cut -d = -f 2)"
+source ${HR_WORKSPACE}/HEAD/devel/setup.bash
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64/
+```
+
+Ensure you source your ~/.bashrc afterwards:
+```bash
+source ~/.bashrc
+```
+
+#### 3. Install dependencies
+If you have an NVIDIA GPU and have CUDA setup:
+```bash
+sudo pip install dlib tensorflow-gpu keras
+```
+
+Otherwise:
+```bash
+sudo pip install dlib tensorflow keras
+```
+
+#### 4. Checkout ghost repos
+Clone ghost_bridge:
+```bash
+cd ${HR_WORKSPACE}/HEAD/src && git clone https://github.com/opencog/ghost_bridge.git
+```
+
+Clone ros_people_model:
+```bash
+cd ${HR_WORKSPACE}/HEAD/src && git clone https://github.com/elggem/ros_people_model.git
+```
+
+Checkout the ghost branch of hr_launchpad and configs:
+```bash
+cd ${HR_WORKSPACE}/configs && git checkout ghost
+cd ${HR_WORKSPACE}/hr_launchpad && git checkout ghost
+```
+
+Build the head stack
+```bash
+hr build head
+```
+
+#### 5. Setup OpenCog
+Install octool and OpenCog dependencies:
+```bash
+curl -L http://raw.github.com/opencog/ocpkg/master/ocpkg -o /usr/local/bin/octool
+chmod +x /usr/local/bin/octool
+octool -d
+```
+
+Install OpenCog repos:
+```bash
+hr update opencog
+```
+
+Remove ros-behavior-scripting and checkout the ghost-lai branch of opencog and atomspace:
+```bash
+rm -r ${HR_WORKSPACE}/OpenCog/ros-behavior-scripting
+cd ${HR_WORKSPACE}/OpenCog/atomspace && git checkout ghost-lai
+cd ${HR_WORKSPACE}/OpenCog/opencog && git checkout ghost-lai
+```
+
+Build OpenCog:
+```bash
+hr build opencog
 ```
 
 Running
 -------
-Ensure that the HEAD stack is started with the below commands. <robot-name> could be `sophia4` or `han`.
+Run the robot first:
 ```bash
-hr run --nogui --dev --tracker none --sttcontinuous --nomuxtts <robot-name>
+hr run --nogui --dev sophia10
 ```
 
-To run:
+Then run ghost_bridge:
 ```bash
 rosrun ghost_bridge run.sh
 ```
 
-To stop:
+To stop the robot:
+```bash
+hr stop
+```
+
+To stop ghost_bridge:
 ```bash
 rosrun ghost_bridge stop.sh
 ```
