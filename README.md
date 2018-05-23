@@ -64,8 +64,9 @@ Clone ros_people_model:
 cd ${HR_WORKSPACE}/HEAD/src && git clone https://github.com/elggem/ros_people_model.git
 ```
 
-Checkout the ghost branch of hr_launchpad and configs:
+Checkout the ghost branch of chatbot, hr_launchpad and configs:
 ```bash
+cd ${HR_WORKSPACE}/HEAD/src/chatbot && git checkout ghost
 cd ${HR_WORKSPACE}/configs && git checkout ghost
 cd ${HR_WORKSPACE}/hr_launchpad && git checkout ghost
 ```
@@ -90,7 +91,7 @@ hr update opencog
 
 Remove ros-behavior-scripting and checkout the ghost-lai branch of opencog and atomspace:
 ```bash
-rm -r ${HR_WORKSPACE}/OpenCog/ros-behavior-scripting
+sudo rm -r ${HR_WORKSPACE}/OpenCog/ros-behavior-scripting
 cd ${HR_WORKSPACE}/OpenCog/atomspace && git checkout ghost-lai
 cd ${HR_WORKSPACE}/OpenCog/opencog && git checkout ghost-lai
 ```
