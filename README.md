@@ -54,9 +54,11 @@ sudo pip install dlib tensorflow keras
 ```
 
 #### 4. Checkout ghost repos
-Clone ghost_bridge:
+Clone ghost_bridge and checkout v0.5.0:
 ```bash
 cd ${HR_WORKSPACE}/HEAD/src && git clone https://github.com/opencog/ghost_bridge.git
+git fetch --all --tags --prune
+git checkout tags/v0.5.0
 ```
 
 Clone ros_people_model:
