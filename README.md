@@ -78,8 +78,8 @@ hr build head
 #### 5. Setup OpenCog
 Install octool and OpenCog dependencies:
 ```bash
-curl -L http://raw.github.com/opencog/ocpkg/master/ocpkg -o /usr/local/bin/octool
-chmod +x /usr/local/bin/octool
+sudo curl -L http://raw.github.com/opencog/ocpkg/master/ocpkg -o /usr/local/bin/octool
+sudo chmod +x /usr/local/bin/octool
 octool -d
 ```
 
