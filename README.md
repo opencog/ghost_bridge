@@ -89,6 +89,11 @@ Install OpenCog repos:
 hr update opencog
 ```
 
+Install relex dependencies:
+```bash
+cd ${HR_WORKSPACE}/OpenCog/relex/install-scripts && ./install-ubuntu-dependencies.sh
+```
+
 Remove ros-behavior-scripting and checkout the ghost-lai branch of opencog and atomspace:
 ```bash
 sudo rm -r ${HR_WORKSPACE}/OpenCog/ros-behavior-scripting
@@ -98,6 +103,7 @@ cd ${HR_WORKSPACE}/OpenCog/opencog && git checkout ghost-lai
 
 Build OpenCog:
 ```bash
+hr clean opencog
 hr build opencog
 ```
 
