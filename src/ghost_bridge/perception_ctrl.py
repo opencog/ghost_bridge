@@ -100,5 +100,5 @@ class PerceptionCtrl:
         :return: None
         """
 
-        content = '(ghost "{}" "{}")\n'.format(face_id, sentence)
+        content = '(ghost "{}")\n'.format(sentence)
         netcat(self.hostname, self.port, content)
