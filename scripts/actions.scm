@@ -10,8 +10,8 @@
 
 (define (delete-definition STR)
  (define dfn
-  (cog-get-link 'DefineLink 'DefinedPredicateNode
-   (DefinedPredicate STR)))
+  (cog-get-link 'DefineLink 'DefinedSchemaNode
+   (DefinedSchema STR)))
 
  (if (not (null? dfn)) (cog-delete (car dfn)) #f))
 
@@ -35,13 +35,13 @@
 ; Say something.
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "say") (List (Concept "this is a test") (Concept ""))))
-;   (cog-evaluate! (Put (DefinedPredicate "say") (List (Concept "") (Concept "chatscript"))))
+;   (cog-execute! (Put (DefinedSchema "say") (List (Concept "this is a test") (Concept ""))))
+;   (cog-execute! (Put (DefinedSchema "say") (List (Concept "") (Concept "chatscript"))))
 ;
 
 (delete-definition say)
 (DefineLink
- (DefinedPredicate say)
+ (DefinedSchema say)
  (LambdaLink
   (VariableList
    (Variable "$text")
@@ -58,12 +58,12 @@
 ; Request robot to point its eyes at a specific point
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "gaze-at") (List (Number 1.3) (Number 1.2) (Number 1.1) (Number 0.5))))
+;   (cog-execute! (Put (DefinedSchema "gaze-at") (List (Number 1.3) (Number 1.2) (Number 1.1) (Number 0.5))))
 ;
 
 (delete-definition gaze-at)
 (DefineLink
- (DefinedPredicate gaze-at)
+ (DefinedSchema gaze-at)
  (LambdaLink
   (VariableList
    (Variable "$x")
@@ -84,12 +84,12 @@
 ; Request robot to turn its face toward a specific point
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "face-toward") (List (Number 1.3) (Number 1.2) (Number 1.1) (Number 0.5))))
+;   (cog-execute! (Put (DefinedSchema "face-toward") (List (Number 1.3) (Number 1.2) (Number 1.1) (Number 0.5))))
 ;
 
 (delete-definition face-toward)
 (DefineLink
- (DefinedPredicate face-toward)
+ (DefinedSchema face-toward)
  (LambdaLink
   (VariableList
    (Variable "$x")
@@ -111,12 +111,12 @@
 ; The expression type should be one of the supported blender animations.
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "blink") (List (Number 5.5) (Number 1.5))))
+;   (cog-execute! (Put (DefinedSchema "blink") (List (Number 5.5) (Number 1.5))))
 ;
 
 (delete-definition blink)
 (DefineLink
- (DefinedPredicate blink)
+ (DefinedSchema blink)
  (LambdaLink
   (VariableList
    (Variable "$mean")
@@ -134,7 +134,7 @@
 ; The expression type should be one of the supported blender animations.
 ;
 ; Example usage:
-;    (cog-evaluate! (Put (DefinedPredicate "saccade")
+;    (cog-execute! (Put (DefinedSchema "saccade")
 ;         (List
 ;           (Number 0.8)
 ;           (Number 0.3)
@@ -150,7 +150,7 @@
 
 (delete-definition saccade)
 (DefineLink
- (DefinedPredicate saccade)
+ (DefinedSchema saccade)
  (LambdaLink
   (VariableList
    (Variable "$mean")
@@ -182,12 +182,12 @@
 ; The expression type should be one of the supported blender animations.
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "emote") (List (Concept "happy") (Number 0.6) (Number 2.0))))
+;   (cog-execute! (Put (DefinedSchema "emote") (List (Concept "happy") (Number 0.6) (Number 2.0))))
 ;
 
 (delete-definition emote)
 (DefineLink
- (DefinedPredicate emote)
+ (DefinedSchema emote)
  (LambdaLink
   (VariableList
    (Variable "$name")
@@ -207,12 +207,12 @@
 ; The expression name should be one of the supported blender animations.
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "gesture") (List (Concept "025_noddingHappy") (Number 3) (Number 0.8) (Number 1))))
+;   (cog-execute! (Put (DefinedSchema "gesture") (List (Concept "025_noddingHappy") (Number 3) (Number 0.8) (Number 1))))
 ;
 
 (delete-definition gesture)
 (DefineLink
- (DefinedPredicate gesture)
+ (DefinedSchema gesture)
  (LambdaLink
   (VariableList
    (Variable "$name")
@@ -233,13 +233,13 @@
 ; Request a display of a soma state
 ;
 ; Example usage:
-;   (cog-evaluate! (Put (DefinedPredicate "soma") (List (Concept "normal") (Number 0.1) (Number 1) (Number 3))))
-;   (cog-evaluate! (Put (DefinedPredicate "soma") (List (Concept "sleep") (Number 1) (Number 1) (Number 3))))
+;   (cog-execute! (Put (DefinedSchema "soma") (List (Concept "normal") (Number 0.1) (Number 1) (Number 3))))
+;   (cog-execute! (Put (DefinedSchema "soma") (List (Concept "sleep") (Number 1) (Number 1) (Number 3))))
 ;
 
 (delete-definition soma)
 (DefineLink
- (DefinedPredicate soma)
+ (DefinedSchema soma)
  (LambdaLink
   (VariableList
    (Variable "$name")
