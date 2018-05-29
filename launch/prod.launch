@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <include file="$(find ros_people_model)/launch/perception.launch"/>
+    <param name="face_detector/topic_name" value="/camera/image_raw"/>
+    <param name="face_detector/fps" value="20" type="double"/>
+    <param name="frontal_face_detector/fps" value="20" type="double"/>
+
+    <node name="faces_throttler" type="throttle" pkg="topic_tools" args="messages /faces 2 /faces_throttled" output="screen"/>
+    <node name="ghost_bridge" pkg="ghost_bridge" type="ghost_bridge_node.py" output="screen"/>
+</launch>
