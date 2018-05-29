@@ -7,7 +7,7 @@ from hr_msgs.msg import ChatMessage
 from hr_msgs.msg import TTS
 from ros_people_model.msg import Faces
 from ghost_bridge.msg import GhostSay
-
+from std_msgs.msg import String
 
 class GhostBridge:
     EMOTION_MAP = {
@@ -34,13 +34,25 @@ class GhostBridge:
         self.face_id = ""
         self.cs_fallback_text = ""
         self.tts_lock = Lock()
-        
+        self.tts_speaking = False
+
         self.tts_pub = rospy.Publisher(self.robot_name + "/tts", TTS, queue_size=1)
+
         rospy.Subscriber('/ghost_bridge/say', GhostSay, self.ghost_say_cb)
         rospy.Subscriber(self.robot_name + "/chatbot_responses", TTS, self.cs_say_cb)
+        rospy.Subscriber(self.robot_name + "/speech_events", String, self.tts_say_cb)
         rospy.Subscriber(self.robot_name + "/words", ChatMessage, self.perceive_word_cb)
         rospy.Subscriber(self.robot_name + "/speech", ChatMessage, self.perceive_sentence_cb)
         rospy.Subscriber('/faces_throttled', Faces, self.faces_cb)
+
+
+
+    def tts_say_cb(self, msg):
+      if msg.data == "start":
+        self.tts_speaking = True
+      elif msg.data == "stop":
+        rospy.sleep(2)
+        self.tts_speaking = False
 
     def cs_say_cb(self, msg):
         with self.tts_lock:
@@ -70,8 +82,12 @@ class GhostBridge:
         self.perception_ctrl.perceive_face_talking(self.face_id, 1.0)
 
     def perceive_sentence_cb(self, msg):
-        self.perception_ctrl.perceive_sentence(self.face_id, msg.utterance)
-        self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
+        if not self.tts_speaking:
+            self.perception_ctrl.perceive_sentence(self.face_id, msg.utterance)
+            self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
+        else:
+            rospy.logdebug("suppressing sentence perceived to GHOST")
+
 
     def faces_cb(self, data):
         for face in data.faces:
