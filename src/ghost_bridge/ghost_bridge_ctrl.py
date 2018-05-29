@@ -45,8 +45,6 @@ class GhostBridge:
         rospy.Subscriber(self.robot_name + "/speech", ChatMessage, self.perceive_sentence_cb)
         rospy.Subscriber('/faces_throttled', Faces, self.faces_cb)
 
-
-
     def tts_say_cb(self, msg):
       if msg.data == "start":
         self.tts_speaking = True
@@ -87,7 +85,6 @@ class GhostBridge:
             self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
         else:
             rospy.logdebug("suppressing sentence perceived to GHOST")
-
 
     def faces_cb(self, data):
         for face in data.faces:
