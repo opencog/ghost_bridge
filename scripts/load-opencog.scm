@@ -10,6 +10,12 @@
              (opencog ghost procedures)
              (opencog exec))
 
+(define start-ecan-agents
+  (string-append "agents-start "
+    "opencog::AFImportanceDiffusionAgent "
+    "opencog::WAImportanceDiffusionAgent "
+    "opencog::WARentCollectionAgent "
+    "opencog::AFRentCollectionAgent"))
 
 (load "load-actions.scm")
 
@@ -18,6 +24,9 @@
 
 (start-cogserver "opencog.conf")
 (cog-logger-set-stdout! #f)
+
+; start the ECAN agents
+(system (string-append "echo \"" start-ecan-agents "\" | nc localhost 17001"))
 
 ; load and start the ghost-bridge-action-node
 (use-modules (opencog ghost-bridge-action-node))
