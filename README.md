@@ -136,10 +136,13 @@ Tips for running on the Zotac:
 #### PCIe Bus Error
 Run the command `dmesg`, if you get the error `PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e6(Receiver ID)`, then you can fix it with the following commands.
 
-  Run: `sudo nano /etc/default/grub`
-  And change this line: `GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"`
-  To: `GRUB_CMDLINE_LINUX_DEFAULT="quiet splash pcie_aspm=off"`
-  Then run: `sudo update-grub`
+Run: `sudo nano /etc/default/grub`
+
+And change this line: `GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"`
+
+To: `GRUB_CMDLINE_LINUX_DEFAULT="quiet splash pcie_aspm=off"`
+
+Then run: `sudo update-grub`
 
 Design Goals
 ------------
