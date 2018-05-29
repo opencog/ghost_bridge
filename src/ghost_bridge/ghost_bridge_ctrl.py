@@ -1,4 +1,5 @@
 from threading import Lock
+from Queue import Queue
 
 import rospy
 from ghost_bridge.netcat import netcat
@@ -32,9 +33,9 @@ class GhostBridge:
         self.perception_ctrl = PerceptionCtrl(self.hostname, self.port)
         self.robot_name = rospy.get_param("robot_name")
         self.face_id = ""
-        self.cs_fallback_text = ""
         self.tts_lock = Lock()
         self.tts_speaking = False
+        self.cs_fallback_queue = Queue()
 
         self.tts_pub = rospy.Publisher(self.robot_name + "/tts", TTS, queue_size=1)
 
@@ -55,16 +56,23 @@ class GhostBridge:
     def cs_say_cb(self, msg):
         with self.tts_lock:
             rospy.logdebug("cs_fallback_text: '{}'".format(msg.text))
-            self.cs_fallback_text = msg.text
+            # Empty the queue and put new answer.
+            while not self.cs_fallback_queue.empty():
+                self.cs_fallback_queue.get_nowait()
+            self.cs_fallback_queue.put(msg.text)
 
     def ghost_say_cb(self, msg):
         rospy.logdebug("ghost_say_cb: '{}', '{}'".format(msg.text, msg.fallback_id))
 
         with self.tts_lock:
             if msg.fallback_id == "chatscript":
-                if self.cs_fallback_text == '':
+                try:
+                    # wait for three seconds if no new response to give chatscript a chance.
+                    cs_fallback_text = self.cs_fallback_queue.get(True,3)
+                except:
+                    cs_fallback_text = ""
                     rospy.logwarn("cs_fallback_text is ''")
-                self.publish_tts(self.cs_fallback_text)
+                self.publish_tts(cs_fallback_text)
             else:
                 self.publish_tts(msg.text)
 
