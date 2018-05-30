@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
-    <include file="$(find ros_people_model)/launch/perception.launch"/>
-    <param name="face_detector/fps" value="1.0"/>
-    <param name="frontal_face_detector/run_face_landmarks" value="false"/>
-    <param name="frontal_face_detector/run_face_id" value="false"/>
-    <param name="frontal_face_detector/run_face_emotions" value="false"/>
-    <param name="frontal_face_detector/run_eye_state" value="false"/>
+    <!-- Perception -->
+    <include file="$(find ros_people_model)/launch/perception.launch">
+        <arg name="face_detector_fps" value="1.0"/>
+        <arg name="frontal_face_detector_fps" value="1.0"/>
+    </include>
 
+    <!-- Ghost Bridge -->
     <node name="faces_throttler" type="throttle" pkg="topic_tools" args="messages /faces 2 /faces_throttled" output="screen"/>
     <node name="ghost_bridge" pkg="ghost_bridge" type="ghost_bridge_node.py" output="screen"/>
 </launch>
