@@ -25,9 +25,6 @@
 (start-cogserver "opencog.conf")
 (cog-logger-set-stdout! #f)
 
-; start the ECAN agents
-(system (string-append "echo \"" start-ecan-agents "\" | nc localhost 17001"))
-
 ; load and start the ghost-bridge-action-node
 (use-modules (opencog ghost-bridge-action-node))
 (start-ghost-bridge-action-node)
@@ -55,10 +52,20 @@
 
 (define (ec)
   (ghost-set-ecan-filter
-    'ImplicationLink 'WordNode 'ConceptNode 'PredicateNode 'EvaluationLink)
+    'ImplicationLink
+    'WordNode
+    'ConceptNode
+    'PredicateNode
+    'EvaluationLink
+    'GroundedPredicateNode)
 )
 
+; apply ECAN filter
 (ec)
+
+; start the ECAN agents
+(system (string-append "echo \"" start-ecan-agents "\" | nc localhost 17001"))
+
 
 ; Start the ghost loop
 (ghost-run)
