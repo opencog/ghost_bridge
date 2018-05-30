@@ -47,7 +47,7 @@ source ~/.bashrc
 Ensure you have an NVIDIA binary driver installed. In Ubuntu, open *Additional Drivers* and select the latest NVIDIA 
 binary driver that is available, e.g. *Using NVIDIA binary driver - version 396.26 from nvidia-396 (proprietary)*.
 
-Install Tensorflow GPU dependencies, follow the instructions [here](https://www.tensorflow.org/install/install_linux),
+Install the Tensorflow GPU dependencies: *CUDA Toolkit 9.0* and *cuDNN SDK v7*. Follow the instructions [here](https://www.tensorflow.org/install/install_linux),
 under the heading *NVIDIA requirements to run TensorFlow with GPU support*.
 
 Add the following to your ~/.bashrc:
@@ -61,9 +61,9 @@ Ensure you source your ~/.bashrc afterwards:
 source ~/.bashrc
 ```
 
-Install Keras and Tensorflow GPU:
+Install Tensorflow GPU and Keras:
 ```bash
-sudo pip install tensorflow-gpu keras
+sudo pip install tensorflow-gpu==1.8.0 keras==2.1.6
 ```
 
 Install dlib:
@@ -76,7 +76,7 @@ sudo -E bash -c "python setup.py install"
 ##### 3.2 Without NVIDIA GPU support
 Install the following:
 ```bash
-sudo pip install dlib tensorflow keras
+sudo pip install dlib==19.13.0 tensorflow==1.8.0 keras==2.1.6
 ```
 
 #### 4. Checkout ghost repos
