@@ -84,12 +84,14 @@ Clone ghost_bridge and checkout v0.5.4:
 ```bash
 cd ${HR_WORKSPACE}/HEAD/src && git clone https://github.com/opencog/ghost_bridge.git
 cd ${HR_WORKSPACE}/HEAD/src/ghost_bridge && git fetch --all --tags --prune
-git checkout tags/v0.5.4
+git checkout tags/v0.5.6
 ```
 
 Clone ros_people_model:
 ```bash
 cd ${HR_WORKSPACE}/HEAD/src && git clone https://github.com/elggem/ros_people_model.git
+cd ${HR_WORKSPACE}/HEAD/src/ros_people_model && git fetch --all --tags --prune
+git checkout tags/v0.2.0
 ```
 
 Checkout the ghost branch of chatbot, hr_launchpad and configs:
