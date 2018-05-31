@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
+    <arg name="perception_fps" default="1"/>
+
     <!-- Perception -->
     <include file="$(find ros_people_model)/launch/perception.launch">
-        <arg name="face_detector_fps" value="1.0"/>
-        <arg name="frontal_face_detector_fps" value="1.0"/>
+        <arg name="perception_fps" value="$(arg perception_fps)"/>
+    </include>
+
+    <!-- Models -->
+    <include file="$(find ros_people_model)/launch/models.launch">
+        <arg name="perception_fps" value="$(arg perception_fps)"/>
     </include>
 
     <!-- Ghost Bridge -->
