@@ -43,11 +43,29 @@ source ~/.bashrc
 
 #### 3. Install dependencies
 ##### 3.1 With NVIDIA GPU support
-Ensure you have an NVIDIA binary driver installed. In Ubuntu, open *Additional Drivers* and select the latest NVIDIA 
-binary driver that is available, e.g. *Using NVIDIA binary driver - version 396.26 from nvidia-396 (proprietary)*.
+Install the Tensorflow and Dlib GPU dependencies: *CUDA Toolkit 9.0* and *cuDNN SDK v7*. This will also install compatible proprietary NVIDIA GPU drivers. The cuDNN runtime is needed for Tensorflow and the cuDNN developer library is needed to compile Dlib with CUDA support.
 
-Install the Tensorflow GPU dependencies: *CUDA Toolkit 9.0* and *cuDNN SDK v7*. Follow the instructions [here](https://www.tensorflow.org/install/install_linux),
-under the heading *NVIDIA requirements to run TensorFlow with GPU support*.
+To install the *CUDA Toolkit 9.0*, download:
+* [CUDA debian network installer](https://developer.nvidia.com/cuda-90-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1604&target_type=debnetwork)
+
+Run the following commands to install CUDA:
+```bash
+cd ~/Downloads
+sudo dpkg -i cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
+sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+sudo apt-get update
+sudo apt-get install cuda=9.0.176-1
+```
+
+To install *cuDNN SDK v7*, download (you will need to login, fill in a short questionnaire accept the terms and conditions):
+* [cuDNN v7.1.4 Runtime Library for Ubuntu16.04 (Deb)](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.1.4/prod/9.0_20180516/Ubuntu16_04-x64/libcudnn7_7.1.4.18-1_cuda9.0_amd64)
+* [cuDNN v7.1.4 Developer Library for Ubuntu16.04 (Deb)](https://developer.nvidia.com/compute/machine-learning/cudnn/secure/v7.1.4/prod/9.0_20180516/Ubuntu16_04-x64/libcudnn7-dev_7.1.4.18-1_cuda9.0_amd64)
+
+Run the following commands to install the cuDNN runtime and developer library:
+```bash
+sudo dpkg -i libcudnn7_7.1.4.18-1+cuda9.0_amd64.deb
+sudo dpkg -i libcudnn7-dev_7.1.4.18-1+cuda9.0_amd64.deb
+```
 
 Add the following to your ~/.bashrc:
 ```bash
@@ -67,6 +85,7 @@ sudo pip install tensorflow-gpu==1.8.0 keras==2.1.6
 
 Install dlib:
 ```bash
+cd $HR_WORKSPACE
 git clone https://github.com/davisking/dlib.git
 cd dlib
 sudo -E bash -c "python setup.py install"
