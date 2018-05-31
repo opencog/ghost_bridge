@@ -191,8 +191,8 @@ install(PROGRAMS
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  launch/run.launch
-  launch/prod.launch
+  launch/avatar.launch
+  launch/robot.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )
 
