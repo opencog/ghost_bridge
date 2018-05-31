@@ -30,7 +30,7 @@ start_opencog_tmux_session()
 
   # Start ghost_bridge
   tmux new-window -t "$_session_name:" -n "ghost_bridge" \
-    "roslaunch ghost_bridge run.launch;
+    "roslaunch ghost_bridge avatar.launch;
     $SHELL"
 
   # Start a shell to cogserver
