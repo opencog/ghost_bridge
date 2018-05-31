@@ -34,7 +34,6 @@ Add the following to your ~/.bashrc,
 source /opt/ros/kinetic/setup.bash
 export HR_WORKSPACE="$(hr env | grep HR_WORKSPACE | cut -d = -f 2)"
 source ${HR_WORKSPACE}/HEAD/devel/setup.bash
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64/
 ```
 
 Ensure you source your ~/.bashrc afterwards:
@@ -107,11 +106,12 @@ hr build head
 ```
 
 #### 5. Setup OpenCog
-Install octool and OpenCog dependencies:
+Install octool, OpenCog dependencies and Relex dependencies:
 ```bash
 sudo curl -L http://raw.github.com/opencog/ocpkg/master/ocpkg -o /usr/local/bin/octool
 sudo chmod +x /usr/local/bin/octool
 octool -d
+octool -l java
 ```
 
 Install OpenCog repos:
@@ -119,7 +119,7 @@ Install OpenCog repos:
 hr update opencog
 ```
 
-Install relex dependencies:
+Install Relex Ubuntu dependencies:
 ```bash
 cd ${HR_WORKSPACE}/OpenCog/relex/install-scripts && ./install-ubuntu-dependencies.sh
 ```
