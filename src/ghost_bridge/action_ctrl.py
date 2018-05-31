@@ -118,7 +118,10 @@ class ActionCtrl:
         self.ghost_tts_pub.publish(msg)
         rospy.logdebug("published say(text={}, fallback={})".format(text, fallback_id))
 
-    def gaze_at(self, x, y, z, speed):
+    def gaze_at(self, face_id, speed):
+        rospy.logwarn("gaze_at: not implemented")
+
+    def point_eyes_at_point(self, x, y, z, speed):
         """  Turn the robot's eyes towards the given target point
 
         :param float x: metres forward
@@ -144,7 +147,7 @@ class ActionCtrl:
         self.gaze_target_pub.publish(msg)
         rospy.logdebug("published gaze_at(x={}, y={}, z={}, speed={})".format(x, y, z, speed))
 
-    def face_toward(self, x, y, z, speed):
+    def face_toward_point(self, x, y, z, speed):
         """ Turn the robot's face towards the given target point.
 
         :param float x: metres forward

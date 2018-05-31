@@ -47,23 +47,11 @@ def say(text_node, fallback_id_node):
     return TruthValue(1, 1)
 
 
-def gaze_at(x_node, y_node, z_node, speed_node):
-    x = float(x_node.name)
-    y = float(y_node.name)
-    z = float(z_node.name)
+def gaze_at(face_id_node, speed_node):
+    face_id = face_id_node.name
     speed = float(speed_node.name)
-    rospy.logdebug("gaze_at(x={}, y={}, z={}, speed={})".format(x, y, z, speed))
-    action_ctrl.gaze_at(x, y, z, speed)
-    return TruthValue(1, 1)
-
-
-def face_toward(x_node, y_node, z_node, speed_node):
-    x = float(x_node.name)
-    y = float(y_node.name)
-    z = float(z_node.name)
-    speed = float(speed_node.name)
-    rospy.logdebug("face_toward(x={}, y={}, z={}, speed={})".format(x, y, z, speed))
-    action_ctrl.face_toward(x, y, z, speed)
+    rospy.logdebug("gaze_at(face_id={}, speed={})".format(face_id, speed))
+    action_ctrl.gaze_at(face_id, speed)
     return TruthValue(1, 1)
 
 

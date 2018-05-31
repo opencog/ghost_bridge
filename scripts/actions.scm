@@ -55,10 +55,10 @@
 
 
 ;---------------------------------------------------------------
-; Request robot to point its eyes at a specific point
+; Request the robot to point its face and eyes at a specific face_id
 ;
 ; Example usage:
-;   (cog-execute! (Put (DefinedSchema "gaze-at") (List (Number 1.3) (Number 1.2) (Number 1.1) (Number 0.5))))
+;   (cog-execute! (Put (DefinedSchema "gaze-at") (List (Concept "aef7dfsd89f8dsf9dsf97dsf") (Number 0.5))))
 ;
 
 (delete-definition gaze-at)
@@ -66,45 +66,14 @@
  (DefinedSchema gaze-at)
  (LambdaLink
   (VariableList
-   (Variable "$x")
-   (Variable "$y")
-   (Variable "$z")
+   (Variable "$face_id")
    (Variable "$speed"))
   (SequentialAndLink
    (EvaluationLink (GroundedPredicate "py:gaze_at")
     (ListLink
-     (Variable "$x")
-     (Variable "$y")
-     (Variable "$z")
+     (Variable "$face_id")
      (Variable "$speed")))
   )))
-
-
-;---------------------------------------------------------------
-; Request robot to turn its face toward a specific point
-;
-; Example usage:
-;   (cog-execute! (Put (DefinedSchema "face-toward") (List (Number 1.3) (Number 1.2) (Number 1.1) (Number 0.5))))
-;
-
-(delete-definition face-toward)
-(DefineLink
- (DefinedSchema face-toward)
- (LambdaLink
-  (VariableList
-   (Variable "$x")
-   (Variable "$y")
-   (Variable "$z")
-   (Variable "$speed"))
-  (SequentialAndLink
-   (EvaluationLink (GroundedPredicate "py:face_toward")
-    (ListLink
-     (Variable "$x")
-     (Variable "$y")
-     (Variable "$z")
-     (Variable "$speed")))
-  )))
-
 
 ; -------------------------------------------------------------
 ; Request a display of a facial expression (smile, frown, etc.)
