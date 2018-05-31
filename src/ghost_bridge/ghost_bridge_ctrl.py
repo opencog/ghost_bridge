@@ -1,14 +1,14 @@
-from threading import Lock
-from Queue import Queue
+from Queue import Queue, Empty
 
 import rospy
-from ghost_bridge.netcat import netcat
+from ghost_bridge.action_feedback_ctrl import ActionFeedbackCtrl
+from ghost_bridge.msg import GhostSay
 from ghost_bridge.perception_ctrl import PerceptionCtrl
 from hr_msgs.msg import ChatMessage
 from hr_msgs.msg import TTS
 from ros_people_model.msg import Faces
-from ghost_bridge.msg import GhostSay
 from std_msgs.msg import String
+
 
 class GhostBridge:
     EMOTION_MAP = {
@@ -26,16 +26,20 @@ class GhostBridge:
         1: "right"
     }
 
+    TTS_STOP_SLEEP_TIME = 2.0
+
     def __init__(self):
         self.hostname = "localhost"
         self.port = 17001
 
+        self.action_feedback_ctrl = ActionFeedbackCtrl(self.hostname, self.port)
         self.perception_ctrl = PerceptionCtrl(self.hostname, self.port)
         self.robot_name = rospy.get_param("robot_name")
         self.face_id = ""
-        self.tts_lock = Lock()
         self.tts_speaking = False
-        self.cs_fallback_queue = Queue()
+
+        # max size of 1 so that we all ways have the latest ChatScript answer if there is one
+        self.cs_fallback_queue = Queue(maxsize=1)
 
         self.tts_pub = rospy.Publisher(self.robot_name + "/tts", TTS, queue_size=1)
 
@@ -47,34 +51,31 @@ class GhostBridge:
         rospy.Subscriber('/faces_throttled', Faces, self.faces_cb)
 
     def tts_say_cb(self, msg):
-      if msg.data == "start":
-        self.tts_speaking = True
-      elif msg.data == "stop":
-        rospy.sleep(2)
-        self.tts_speaking = False
+        if msg.data == "start":
+            self.tts_speaking = True
+            self.action_feedback_ctrl.say_started()
+        elif msg.data == "stop":
+            rospy.sleep(GhostBridge.TTS_STOP_SLEEP_TIME)
+            self.tts_speaking = False
+            self.action_feedback_ctrl.say_finished()
 
     def cs_say_cb(self, msg):
-        with self.tts_lock:
-            rospy.logdebug("cs_fallback_text: '{}'".format(msg.text))
-            # Empty the queue and put new answer.
-            while not self.cs_fallback_queue.empty():
-                self.cs_fallback_queue.get_nowait()
-            self.cs_fallback_queue.put(msg.text)
+        rospy.logdebug("cs_fallback_text: '{}'".format(msg.text))
+        self.cs_fallback_queue.put(msg.text)
 
     def ghost_say_cb(self, msg):
         rospy.logdebug("ghost_say_cb: '{}', '{}'".format(msg.text, msg.fallback_id))
 
-        with self.tts_lock:
-            if msg.fallback_id == "chatscript":
-                try:
-                    # wait for three seconds if no new response to give chatscript a chance.
-                    cs_fallback_text = self.cs_fallback_queue.get(True,3)
-                except:
-                    cs_fallback_text = ""
-                    rospy.logwarn("cs_fallback_text is ''")
-                self.publish_tts(cs_fallback_text)
-            else:
-                self.publish_tts(msg.text)
+        if msg.fallback_id == "chatscript":
+            try:
+                # wait for three seconds if no new response to give ChatScript a chance.
+                cs_fallback_text = self.cs_fallback_queue.get(True, 3)
+            except Empty:
+                cs_fallback_text = ""
+                rospy.logwarn("cs_fallback_text is ''")
+            self.publish_tts(cs_fallback_text)
+        else:
+            self.publish_tts(msg.text)
 
     def publish_tts(self, text):
         msg = TTS()
