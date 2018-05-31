@@ -66,7 +66,9 @@
  (DefinedSchema say-cancel)
  (LambdaLink
   (SequentialAndLink
-   (EvaluationLink (GroundedPredicate "py:say_cancel"))
+   (EvaluationLink
+     (GroundedPredicate "py:say_cancel")
+     (List))
   )))
 
 ;---------------------------------------------------------------
