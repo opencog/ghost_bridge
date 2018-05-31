@@ -170,9 +170,14 @@ Run the robot first:
 hr run --nogui --dev sophia10
 ```
 
-Then run ghost_bridge:
+Then run ghost_bridge with the avatar:
 ```bash
 rosrun ghost_bridge run.sh
+```
+
+Then run ghost_bridge with the actual robot:
+```bash
+rosrun ghost_bridge run.sh robot
 ```
 
 To stop the robot:

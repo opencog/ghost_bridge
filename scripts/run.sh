@@ -10,6 +10,13 @@ _session_name="opencog"
 # hrtool workspace
 HR_WORKSPACE="$(hr env | grep HR_WORKSPACE | cut -d = -f 2)"
 
+# choose ghost bridge launch file name
+GB_LAUNCH_FILE='avatar.launch'
+if [ $1 == 'robot' ]
+then
+    GB_LAUNCH_FILE='robot.launch'
+fi
+
 # start opencog processes in tmux session.
 start_opencog_tmux_session()
 {
@@ -30,7 +37,7 @@ start_opencog_tmux_session()
 
   # Start ghost_bridge
   tmux new-window -t "$_session_name:" -n "ghost_bridge" \
-    "roslaunch ghost_bridge avatar.launch;
+    "roslaunch ghost_bridge $GB_LAUNCH_FILE;
     $SHELL"
 
   # Start a shell to cogserver
