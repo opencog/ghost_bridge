@@ -119,6 +119,13 @@ cd ${HR_WORKSPACE}/configs && git checkout ghost
 cd ${HR_WORKSPACE}/hr_launchpad && git checkout ghost
 ```
 
+Clone realsense:
+```bash
+cd ${HR_WORKSPACE}/HEAD/src && git clone https://github.com/intel-ros/realsense.git
+cd ${HR_WORKSPACE}/HEAD/src/realsense && git fetch --all --tags --prune
+git checkout tags/2.0.3
+```
+
 Build the head stack
 ```bash
 hr build head
