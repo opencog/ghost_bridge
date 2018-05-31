@@ -20,10 +20,10 @@
 ; Action name definitions
 ;
 
-
 (define say "say")
+(define say-cancel "say-cancel")
+
 (define gaze-at "gaze-at")
-(define face-toward "face-toward")
 (define blink "blink")
 (define saccade "saccade")
 (define emote "emote")
@@ -53,6 +53,21 @@
      (Variable "$fallback_id")))
   )))
 
+
+; -------------------------------------------------------------
+; Cancel the current utterance being spoken
+;
+; Example usage:
+;   (cog-execute! (Put (DefinedSchema "say-cancel")))
+;
+
+(delete-definition say-cancel)
+(DefineLink
+ (DefinedSchema say-cancel)
+ (LambdaLink
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:say_cancel"))
+  )))
 
 ;---------------------------------------------------------------
 ; Request the robot to point its face and eyes at a specific face_id

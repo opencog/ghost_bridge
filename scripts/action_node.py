@@ -47,6 +47,12 @@ def say(text_node, fallback_id_node):
     return TruthValue(1, 1)
 
 
+def say_cancel():
+    rospy.logdebug("say_cancel()")
+    action_ctrl.say_cancel()
+    return TruthValue(1, 1)
+
+
 def gaze_at(face_id_node, speed_node):
     face_id = face_id_node.name
     speed = float(speed_node.name)

@@ -30,6 +30,7 @@ from blender_api_msgs.msg import SetGesture
 from blender_api_msgs.msg import SomaState
 from blender_api_msgs.msg import Target
 from ghost_bridge.msg import GhostSay
+from std_msgs.msg import String
 
 logger = logging.getLogger('hr.ghost_bridge_actions')
 
@@ -77,6 +78,10 @@ class ActionCtrl:
         self.blink_pub = rospy.Publisher("/blender_api/set_blink_randomly", BlinkCycle, queue_size=1)
         self.saccade_pub = rospy.Publisher("/blender_api/set_saccade", SaccadeCycle, queue_size=1)
 
+        # Publisher for controlling text to speech, i.e. making text to speech stop
+        self.robot_name = rospy.get_param("robot_name")
+        self.tts_control_pub = rospy.Publisher(self.robot_name + '/tts_control', String, queue_size=1)
+
         # Publishers for making the face and eyes look at a point
         self.face_target_pub = rospy.Publisher("/blender_api/set_face_target", Target, queue_size=1)
         self.gaze_target_pub = rospy.Publisher("/blender_api/set_gaze_target", Target, queue_size=1)
@@ -118,6 +123,18 @@ class ActionCtrl:
 
         self.ghost_tts_pub.publish(msg)
         rospy.logdebug("published say(text={}, fallback={})".format(text, fallback_id))
+
+    def say_cancel(self):
+        """ Stop the robot from vocalizing its current sentence
+
+        :return: None
+        """
+
+        # TODO: the implementation for cancelling robot actions is bloody hacky, we should be using actionlib for
+        # controlling robot actions. See here: http://wiki.ros.org/actionlib
+        self.tts_control_pub.publish("shutup")
+
+        rospy.logdebug("published shutup")
 
     def gaze_at(self, face_id, speed):
         rospy.logwarn("gaze_at: not implemented")
