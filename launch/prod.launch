@@ -2,8 +2,8 @@
 
 <launch>
     <!-- RealSense camera settings -->
-    <arg name="width" default="640"/>
-    <arg name="height" default="480"/>
+    <arg name="width" default="1280"/>
+    <arg name="height" default="720"/>
     <arg name="fps" default="30"/>
 
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
