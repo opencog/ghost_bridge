@@ -150,8 +150,12 @@
 ; Request a display of an emotion (smile, frown, etc.)
 ; The expression type should be one of the supported blender animations.
 ;
+; blend the emotion with other emotions that also have blend=True. If an emotion is sent with blend=False, then it will
+; overwrite all previously sent and active blendable emotions.
+;
+;
 ; Example usage:
-;   (cog-execute! (Put (DefinedSchema "emote") (List (Concept "happy") (Number 0.6) (Number 2.0))))
+;   (cog-execute! (Put (DefinedSchema "emote") (List (Concept "happy") (Number 0.6) (Number 2.0) (Concept "False"))))
 ;
 
 (delete-definition emote)
@@ -161,13 +165,15 @@
   (VariableList
    (Variable "$name")
    (Variable "$magnitude")
-   (Variable "$duration"))
+   (Variable "$duration")
+   (Variable "$blend"))
   (SequentialAndLink
    (EvaluationLink (GroundedPredicate "py:emote")
     (ListLink
      (Variable "$name")
      (Variable "$magnitude")
-     (Variable "$duration")))
+     (Variable "$duration")
+     (Variable "$blend")))
   )))
 
 

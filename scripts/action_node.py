@@ -83,12 +83,13 @@ def saccade(mean_node, variation_node, paint_scale_node, eye_size_node, eye_dist
     return TruthValue(1, 1)
 
 
-def emote(name_node, magnitude_node, duration_node):
+def emote(name_node, magnitude_node, duration_node, blend_node):
     name = name_node.name
     magnitude = float(magnitude_node.name)
     duration = float(duration_node.name)
-    rospy.logdebug("emote(name='{}', magnitude={}, duration={})".format(name, magnitude, duration))
-    action_ctrl.emote(name, magnitude, duration)
+    blend = blend_node.name == "True"
+    rospy.logdebug("emote(name='{}', magnitude={}, duration={}, blend={})".format(name, magnitude, duration, blend))
+    action_ctrl.emote(name, magnitude, duration, blend)
     return TruthValue(1, 1)
 
 

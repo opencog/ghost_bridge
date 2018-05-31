@@ -70,7 +70,8 @@ class ActionCtrl:
         self.get_conv_mat()
 
         # Publishers for making facial expressions and gestures
-        self.expression_pub = rospy.Publisher("/blender_api/set_emotion_state", EmotionState, queue_size=1)
+        self.emotion_state_pub = rospy.Publisher("/blender_api/set_emotion_state", EmotionState, queue_size=1)
+        self.emotion_value_pub = rospy.Publisher("/blender_api/set_emotion_value", EmotionState, queue_size=1)
         self.gesture_pub = rospy.Publisher("/blender_api/set_gesture", SetGesture, queue_size=1)
         self.soma_pub = rospy.Publisher("/blender_api/set_soma_state", SomaState, queue_size=2)
         self.blink_pub = rospy.Publisher("/blender_api/set_blink_randomly", BlinkCycle, queue_size=1)
@@ -229,12 +230,14 @@ class ActionCtrl:
                        "weight_eyes={}, weight_mouth={})".format(mean, variation, paint_scale, eye_size, eye_distance,
                                                                  mouth_width, mouth_height, weight_eyes, weight_mouth))
 
-    def emote(self, name, magnitude, duration):
+    def emote(self, name, magnitude, duration, blend):
         """ Set the robot's emotional state
 
         :param str name: the id of the emotion
         :param float magnitude: the magnitude of the emotion from 0.0 to 1.0
         :param float duration: the time in seconds that the emotion lasts for
+        :param bool blend: blend the emotion with other emotions that also have blend=True. If an emotion is sent with
+                           blend=False, then it will overwrite all previously sent and active blendable emotions.
         :return: None
         """
         msg = EmotionState()
@@ -243,7 +246,10 @@ class ActionCtrl:
         msg.duration.secs = int(duration)
         msg.duration.nsecs = 1000000000 * (duration - int(duration))
 
-        self.expression_pub.publish(msg)
+        if blend:
+            self.emotion_value_pub.publish(msg)
+        else:
+            self.emotion_state_pub.publish(msg)
         rospy.logdebug("published emote(name={}, magnitude={}, duration={})".format(name, magnitude, duration))
 
     def gesture(self, name, speed, magnitude, repeat):
