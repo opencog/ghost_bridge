@@ -30,6 +30,7 @@ from blender_api_msgs.msg import SetGesture
 from blender_api_msgs.msg import SomaState
 from blender_api_msgs.msg import Target
 from ghost_bridge.msg import GhostSay
+from blender_api_msgs.srv import SetParam
 from std_msgs.msg import String
 
 logger = logging.getLogger('hr.ghost_bridge_actions')
@@ -52,6 +53,9 @@ logger = logging.getLogger('hr.ghost_bridge_actions')
 
 
 class ActionCtrl:
+
+    BPY_PARAM_SACCADE = "bpy.data.scenes[\"Scene\"].actuators.ACT_saccade.HEAD_PARAM_enabled"
+    BPY_PARAM_BLINK = "bpy.data.scenes[\"Scene\"].actuators.ACT_blink_randomly.HEAD_PARAM_enabled"
 
     def __init__(self):
         # The below will hang until roscore is started!
@@ -88,6 +92,9 @@ class ActionCtrl:
 
         # Text to speech publisher
         self.ghost_tts_pub = rospy.Publisher("/ghost_bridge/say", GhostSay, queue_size=1)
+
+        # blender set param
+        self.blender_set_param_srv = rospy.ServiceProxy('/blender_api/set_param', SetParam)
 
         # Subscribers to get the available emotions and gestures
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
@@ -210,7 +217,11 @@ class ActionCtrl:
         rospy.logdebug("published blink(mean={}, variation={})".format(mean, variation))
 
     def blink_cancel(self):
-        rospy.logwarn("blink_cancel: not implemented")
+        try:
+            self.blender_set_param_srv(ActionCtrl.BPY_PARAM_BLINK, False)
+            rospy.logdebug("blink_cancel: blender_api/set_param service called")
+        except rospy.ServiceException, e:
+            rospy.logerr("blink_cancel: blender_api/set_param service call failed %s" % e)
 
     def saccade(self, mean, variation, paint_scale, eye_size, eye_distance, mouth_width, mouth_height, weight_eyes,
                 weight_mouth):
@@ -254,7 +265,11 @@ class ActionCtrl:
                                                                  mouth_width, mouth_height, weight_eyes, weight_mouth))
 
     def saccade_cancel(self):
-        rospy.logwarn("saccade_cancel: not implemented")
+        try:
+            self.blender_set_param_srv(ActionCtrl.BPY_PARAM_SACCADE, False)
+            rospy.logdebug("saccade_cancel: blender_api/set_param service called")
+        except rospy.ServiceException, e:
+            rospy.logerr("saccade_cancel: blender_api/set_param service call failed %s" % e)
 
     def emote(self, name, magnitude, duration, blend):
         """ Set the robot's emotional state
