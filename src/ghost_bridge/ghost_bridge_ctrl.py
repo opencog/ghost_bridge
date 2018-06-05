@@ -1,7 +1,9 @@
 from Queue import Queue, Empty
 
 import rospy
+from dynamic_reconfigure.server import Server
 from ghost_bridge.action_feedback_ctrl import ActionFeedbackCtrl
+from ghost_bridge.cfg import GhostBridgeConfig
 from ghost_bridge.msg import GhostSay
 from ghost_bridge.perception_ctrl import PerceptionCtrl
 from hr_msgs.msg import ChatMessage
@@ -37,6 +39,7 @@ class GhostBridge:
         self.robot_name = rospy.get_param("robot_name")
         self.face_id = ""
         self.tts_speaking = False
+        self.sr_continuous = True
 
         # max size of 1 so that we all ways have the latest ChatScript answer if there is one
         self.cs_fallback_queue = Queue(maxsize=1)
@@ -50,12 +53,20 @@ class GhostBridge:
         rospy.Subscriber(self.robot_name + "/speech", ChatMessage, self.perceive_sentence_cb)
         rospy.Subscriber('/faces_throttled', Faces, self.faces_cb)
 
+        self.dynamic_reconfigure_srv = Server(GhostBridgeConfig, self.dynamic_reconfigure_callback)
+
+    def dynamic_reconfigure_callback(self, config, level):
+        self.sr_continuous = config['sr_continuous']
+        rospy.logdebug("Dynamic reconfigure callback result: {0}".format(config))
+        return config
+
     def tts_say_cb(self, msg):
         if msg.data == "start":
             self.tts_speaking = True
             self.action_feedback_ctrl.say_started()
         elif msg.data == "stop":
-            rospy.sleep(GhostBridge.TTS_STOP_SLEEP_TIME)
+            if not self.sr_continuous:
+                rospy.sleep(GhostBridge.TTS_STOP_SLEEP_TIME)
             self.tts_speaking = False
             self.action_feedback_ctrl.say_finished()
 
@@ -89,7 +100,7 @@ class GhostBridge:
         self.perception_ctrl.perceive_face_talking(self.face_id, 1.0)
 
     def perceive_sentence_cb(self, msg):
-        if not self.tts_speaking:
+        if self.sr_continuous or not self.tts_speaking:
             self.perception_ctrl.perceive_sentence(self.face_id, msg.utterance)
             self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
         else:
