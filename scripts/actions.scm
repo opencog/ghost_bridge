@@ -28,7 +28,7 @@
 (define gaze-at-cancel "gaze-at-cancel")
 
 (define blink "blink")
-(define blink "blink-cancel")
+(define blink-cancel "blink-cancel")
 
 (define saccade "saccade")
 (define saccade-cancel "saccade-cancel")
