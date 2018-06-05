@@ -139,6 +139,9 @@ class ActionCtrl:
     def gaze_at(self, face_id, speed):
         rospy.logwarn("gaze_at: not implemented")
 
+    def gaze_at_cancel(self):
+        rospy.logwarn("gaze_at_cancel: not implemented")
+
     def point_eyes_at_point(self, x, y, z, speed):
         """  Turn the robot's eyes towards the given target point
 
@@ -206,6 +209,9 @@ class ActionCtrl:
         self.blink_pub.publish(msg)
         rospy.logdebug("published blink(mean={}, variation={})".format(mean, variation))
 
+    def blink_cancel(self):
+        rospy.logwarn("blink_cancel: not implemented")
+
     def saccade(self, mean, variation, paint_scale, eye_size, eye_distance, mouth_width, mouth_height, weight_eyes,
                 weight_mouth):
         """ Set the robot's eye saccade cycle, i.e. how the eye's twitch and move around automatically.
@@ -223,7 +229,7 @@ class ActionCtrl:
 
         Examples:
             ctrl = ActionCtrl()
-            ctrl.saccade(0.8, 0.3, 0.3, 15.0, 100.0, 90.0, 27.0, 0.8, 0.2)  # Explore-the-room when not conversing
+            ctrl.saccade(0.8, 0.3, 1.0, 15.0, 100.0, 90.0, 27.0, 0.8, 0.2)  # Explore-the-room when not conversing
             ctrl.saccade(0.8, 0.5, 0.3, 11.5, 100.0, 90.0, 5.0, 0.8, 0.2)   # Variation 1: study face being looked at
                                                                             # during conversation
             ctrl.saccade(1.0, 0.6, 0.3, 11.0,  80.0, 50.0, 13.0, 0.8, 0.2)  # Variation 2: study face being looked at
@@ -246,6 +252,9 @@ class ActionCtrl:
                        "eye_size={}, eye_distance={}, mouth_width={}, mouth_height={}, "
                        "weight_eyes={}, weight_mouth={})".format(mean, variation, paint_scale, eye_size, eye_distance,
                                                                  mouth_width, mouth_height, weight_eyes, weight_mouth))
+
+    def saccade_cancel(self):
+        rospy.logwarn("saccade_cancel: not implemented")
 
     def emote(self, name, magnitude, duration, blend):
         """ Set the robot's emotional state
@@ -314,6 +323,9 @@ class ActionCtrl:
         self.soma_pub.publish(msg)
         rospy.logdebug("publish soma(name={}, magnitude={}, rate={}, ease_in={})".format(name, magnitude, rate,
                                                                                          ease_in))
+
+    def soma_cancel(self):
+        rospy.logwarn("soma_cancel: not implemented")
 
     def get_emotions_cb(self, msg):
         """ Log the available emotions

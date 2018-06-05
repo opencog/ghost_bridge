@@ -61,6 +61,12 @@ def gaze_at(face_id_node, speed_node):
     return TruthValue(1, 1)
 
 
+def gaze_at_cancel():
+    rospy.logdebug("gaze_at_cancel()")
+    action_ctrl.gaze_at_cancel()
+    return TruthValue(1, 1)
+
+
 def blink(mean_node, variation_node):
     mean = float(mean_node.name)
     variation = float(variation_node.name)
@@ -86,6 +92,12 @@ def saccade(mean_node, variation_node, paint_scale_node, eye_size_node, eye_dist
                                                              mouth_width, mouth_height, weight_eyes, weight_mouth))
     action_ctrl.saccade(mean, variation, paint_scale, eye_size, eye_distance, mouth_width, mouth_height, weight_eyes,
                         weight_mouth)
+    return TruthValue(1, 1)
+
+
+def saccade_cancel():
+    rospy.logdebug("saccade_cancel()")
+    action_ctrl.saccade_cancel()
     return TruthValue(1, 1)
 
 
@@ -116,4 +128,10 @@ def soma(name_node, magnitude_node, rate_node, ease_in_node):
     ease_in = float(ease_in_node.name)
     rospy.logdebug("soma(name='{}', magnitude={}, rate={}, ease_in={})".format(name, magnitude, rate, ease_in))
     action_ctrl.soma(name, magnitude, rate, ease_in)
+    return TruthValue(1, 1)
+
+
+def soma_cancel():
+    rospy.logdebug("soma_cancel()")
+    action_ctrl.soma_cancel()
     return TruthValue(1, 1)

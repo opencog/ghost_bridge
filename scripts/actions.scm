@@ -18,18 +18,26 @@
 
 ; -------------------------------------------------------------
 ; Action name definitions
+; TODO: I think 'stop' might be better than 'cancel' for stopping each action
 ;
 
 (define say "say")
 (define say-cancel "say-cancel")
 
 (define gaze-at "gaze-at")
+(define gaze-at-cancel "gaze-at-cancel")
+
 (define blink "blink")
+(define blink "blink-cancel")
+
 (define saccade "saccade")
+(define saccade-cancel "saccade-cancel")
+
 (define emote "emote")
 (define gesture "gesture")
-(define soma "soma")
 
+(define soma "soma")
+(define soma-cancel "soma-cancel")
 
 ; -------------------------------------------------------------
 ; Say something.
@@ -92,6 +100,26 @@
      (Variable "$speed")))
   )))
 
+
+; -------------------------------------------------------------
+; Cancel the current gaze-at action
+;
+; Example usage:
+;   (cog-execute! (Put (DefinedSchema "gaze-at-cancel")))
+;
+
+(delete-definition gaze-at-cancel)
+(DefineLink
+ (DefinedSchema gaze-at-cancel)
+ (LambdaLink
+  (SequentialAndLink
+   (EvaluationLink
+     (GroundedPredicate "py:gaze_at_cancel")
+     (List))
+  )))
+
+
+
 ; -------------------------------------------------------------
 ; Request a display of a facial expression (smile, frown, etc.)
 ; The expression type should be one of the supported blender animations.
@@ -112,6 +140,24 @@
     (ListLink
      (Variable "$mean")
      (Variable "$variation")))
+  )))
+
+
+; -------------------------------------------------------------
+; Cancel the current blink cycle
+;
+; Example usage:
+;   (cog-execute! (Put (DefinedSchema "blink-cancel")))
+;
+
+(delete-definition blink-cancel)
+(DefineLink
+ (DefinedSchema blink-cancel)
+ (LambdaLink
+  (SequentialAndLink
+   (EvaluationLink
+     (GroundedPredicate "py:blink_cancel")
+     (List))
   )))
 
 
@@ -160,6 +206,24 @@
      (Variable "$mouth_height")
      (Variable "$weight_eyes")
      (Variable "$weight_mouth")))
+  )))
+
+
+; -------------------------------------------------------------
+; Cancel the current saccade cycle
+;
+; Example usage:
+;   (cog-execute! (Put (DefinedSchema "saccade-cancel")))
+;
+
+(delete-definition saccade-cancel)
+(DefineLink
+ (DefinedSchema saccade-cancel)
+ (LambdaLink
+  (SequentialAndLink
+   (EvaluationLink
+     (GroundedPredicate "py:saccade_cancel")
+     (List))
   )))
 
 
@@ -245,6 +309,24 @@
      (Variable "$magnitude")
      (Variable "$rate")
      (Variable "$ease_in")))
+  )))
+
+
+; -------------------------------------------------------------
+; Cancel the current soma cycle
+;
+; Example usage:
+;   (cog-execute! (Put (DefinedSchema "soma-cancel")))
+;
+
+(delete-definition soma-cancel)
+(DefineLink
+ (DefinedSchema soma-cancel)
+ (LambdaLink
+  (SequentialAndLink
+   (EvaluationLink
+     (GroundedPredicate "py:soma_cancel")
+     (List))
   )))
 
 
