@@ -75,8 +75,8 @@
  (LambdaLink
   (SequentialAndLink
    (EvaluationLink
-     (GroundedPredicate "py:say_cancel")
-     (List))
+    (GroundedPredicate "py:say_cancel")
+    (List))
   )))
 
 ;---------------------------------------------------------------
@@ -114,8 +114,8 @@
  (LambdaLink
   (SequentialAndLink
    (EvaluationLink
-     (GroundedPredicate "py:gaze_at_cancel")
-     (List))
+    (GroundedPredicate "py:gaze_at_cancel")
+    (List))
   )))
 
 
@@ -156,8 +156,8 @@
  (LambdaLink
   (SequentialAndLink
    (EvaluationLink
-     (GroundedPredicate "py:blink_cancel")
-     (List))
+    (GroundedPredicate "py:blink_cancel")
+    (List))
   )))
 
 
@@ -222,8 +222,8 @@
  (LambdaLink
   (SequentialAndLink
    (EvaluationLink
-     (GroundedPredicate "py:saccade_cancel")
-     (List))
+    (GroundedPredicate "py:saccade_cancel")
+    (List))
   )))
 
 
@@ -316,17 +316,20 @@
 ; Cancel the current soma cycle
 ;
 ; Example usage:
-;   (cog-execute! (Put (DefinedSchema "soma-cancel")))
+;   (cog-execute! (Put (DefinedSchema "soma-cancel") (List (Concept "normal"))))
 ;
 
 (delete-definition soma-cancel)
 (DefineLink
  (DefinedSchema soma-cancel)
  (LambdaLink
+  (VariableList
+   (Variable "$name"))
   (SequentialAndLink
    (EvaluationLink
-     (GroundedPredicate "py:soma_cancel")
-     (List))
+    (GroundedPredicate "py:soma_cancel")
+    (ListLink
+     (Variable "$name")))
   )))
 
 

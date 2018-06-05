@@ -316,7 +316,7 @@ class ActionCtrl:
     def soma(self, name, magnitude, rate, ease_in):
         """ Sets the robot's background facial expressions
 
-        :param str name: the id of the soma state
+        :param str name: the id of the soma state, this can be one of 'normal', 'breathing', 'normal-saccades' and 'sleep'
         :param float magnitude: the magnitude of the soma facial expression from 0.0 to 1.0
         :param float rate:
         :param float ease_in:
@@ -339,8 +339,19 @@ class ActionCtrl:
         rospy.logdebug("publish soma(name={}, magnitude={}, rate={}, ease_in={})".format(name, magnitude, rate,
                                                                                          ease_in))
 
-    def soma_cancel(self):
-        rospy.logwarn("soma_cancel: not implemented")
+    def soma_cancel(self, name):
+        msg = SomaState()
+        msg.name = name
+        msg.ease_in.secs = 0
+        msg.ease_in.nsecs = 0.1 * 1000000000
+        msg.magnitude = 0.0
+        msg.rate = 1
+
+        self.soma_pub.publish(msg)
+        rospy.logdebug("publish soma(name={}, magnitude={}, rate={}, ease_in={})".format(name, msg.magnitude, msg.rate,
+                                                                                         msg.ease_in.secs))
+
+        rospy.logdebug("soma_cancel: {}".format(name))
 
     def get_emotions_cb(self, msg):
         """ Log the available emotions

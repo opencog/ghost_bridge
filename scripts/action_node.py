@@ -131,7 +131,8 @@ def soma(name_node, magnitude_node, rate_node, ease_in_node):
     return TruthValue(1, 1)
 
 
-def soma_cancel():
-    rospy.logdebug("soma_cancel()")
-    action_ctrl.soma_cancel()
+def soma_cancel(name_node):
+    name = name_node.name
+    rospy.logdebug("soma_cancel(name='{}')".format(name))
+    action_ctrl.soma_cancel(name)
     return TruthValue(1, 1)
