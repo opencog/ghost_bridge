@@ -66,6 +66,9 @@
 ; start the ECAN agents
 (system (string-append "echo \"" start-ecan-agents "\" | nc localhost 17001"))
 
+; start recording perception inputs after a delay of few seconds.
+(sleep 5)
+(perception-start!)
 
 ; Start the ghost loop
 (ghost-run)
