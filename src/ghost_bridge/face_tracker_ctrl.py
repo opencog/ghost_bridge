@@ -26,7 +26,6 @@ class FaceTracker(object):
                 x = position[0]
                 y = position[1]
                 z = position[2]
-                print("face tracking inside: ", x, y, z)
                 self.point_eyes_at_point(x, y, z, self.eye_speed)
                 self.face_toward_point(x, y, z, self.head_speed)
 
