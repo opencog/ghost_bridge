@@ -19,16 +19,13 @@
 
 import logging
 
-import numpy
 import rospy
-import tf
 from blender_api_msgs.msg import AvailableEmotionStates, AvailableGestures
 from blender_api_msgs.msg import BlinkCycle
 from blender_api_msgs.msg import EmotionState
 from blender_api_msgs.msg import SaccadeCycle
 from blender_api_msgs.msg import SetGesture
 from blender_api_msgs.msg import SomaState
-from blender_api_msgs.msg import Target
 from ghost_bridge.msg import GhostSay
 from blender_api_msgs.srv import SetParam
 from std_msgs.msg import String
@@ -53,7 +50,6 @@ logger = logging.getLogger('hr.ghost_bridge_actions')
 
 
 class ActionCtrl:
-
     BPY_PARAM_SACCADE = "bpy.data.scenes[\"Scene\"].actuators.ACT_saccade.HEAD_PARAM_enabled"
     BPY_PARAM_BLINK = "bpy.data.scenes[\"Scene\"].actuators.ACT_blink_randomly.HEAD_PARAM_enabled"
 
@@ -61,18 +57,6 @@ class ActionCtrl:
         # The below will hang until roscore is started!
         rospy.loginfo("Starting ghost_bridge_actions node")
         rospy.init_node("ghost_bridge_actions", log_level=rospy.DEBUG)
-
-        # Obtain the blender-to-camera coordinate-frame conversion
-        # matrix.  XXX FIXME This is some insane hack that does not
-        # make sense.  All 3D coordinates are supposed to be in
-        # head-centered coordinates, bot for the sensory subsystem,
-        # and also for the look-at subsystem. However, someone
-        # screwed something up somewhere, and now we hack around
-        # it here. XXX This is really bad spaghetti-code programming.
-        # Fuck.
-        self.tf = tf.TransformListener()
-        self.conv_mat = None
-        self.get_conv_mat()
 
         # Publishers for making facial expressions and gestures
         self.emotion_state_pub = rospy.Publisher("/blender_api/set_emotion_state", EmotionState, queue_size=1)
@@ -86,10 +70,6 @@ class ActionCtrl:
         self.robot_name = rospy.get_param("robot_name")
         self.tts_control_pub = rospy.Publisher(self.robot_name + '/tts_control', String, queue_size=1)
 
-        # Publishers for making the face and eyes look at a point
-        self.face_target_pub = rospy.Publisher("/blender_api/set_face_target", Target, queue_size=1)
-        self.gaze_target_pub = rospy.Publisher("/blender_api/set_gaze_target", Target, queue_size=1)
-
         # Text to speech publisher
         self.ghost_tts_pub = rospy.Publisher("/ghost_bridge/say", GhostSay, queue_size=1)
 
@@ -99,23 +79,6 @@ class ActionCtrl:
         # Subscribers to get the available emotions and gestures
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
         rospy.Subscriber("/blender_api/available_gestures", AvailableGestures, self.get_gestures_cb)
-
-    def get_conv_mat(self):
-        # try to initialize conv mat if it doesn't exist
-        if self.conv_mat is None:
-            try:
-                rospy.loginfo("Waiting for the camera-blender transform")
-                self.tf.waitForTransform('camera', 'blender', rospy.Time(0), rospy.Duration(10))  # world
-            except Exception:
-                rospy.logerr("No camera transforms!")
-                return None
-
-            rospy.loginfo("Got the camera-blender transform")
-            (trans, rot) = self.tf.lookupTransform('blender', 'camera', rospy.Time(0))
-            a = tf.listener.TransformerROS()
-            self.conv_mat = a.fromTranslationRotation(trans, rot)
-
-        return self.conv_mat
 
     def say(self, text, fallback_id):
         """ Make the robot vocalize text
@@ -149,58 +112,6 @@ class ActionCtrl:
     def gaze_at_cancel(self):
         rospy.logwarn("gaze_at_cancel: not implemented")
 
-    def point_eyes_at_point(self, x, y, z, speed):
-        """  Turn the robot's eyes towards the given target point
-
-        :param float x: metres forward
-        :param float y: metres to robots left
-        :param float z:
-        :param float speed:
-        :return: None
-        """
-
-        conv_mat = self.get_conv_mat()
-        if conv_mat is None:
-            rospy.logerr("gaze_at: conv_mat not initialized")
-            return
-
-        xyz1 = numpy.array([x, y, z, 1.0])
-        xyz = numpy.dot(conv_mat, xyz1)
-        msg = Target()
-        msg.x = xyz[0]
-        msg.y = xyz[1]
-        msg.z = xyz[2]
-        msg.speed = speed
-
-        self.gaze_target_pub.publish(msg)
-        rospy.logdebug("published gaze_at(x={}, y={}, z={}, speed={})".format(x, y, z, speed))
-
-    def face_toward_point(self, x, y, z, speed):
-        """ Turn the robot's face towards the given target point.
-
-        :param float x: metres forward
-        :param float y: metres to robots left
-        :param float z:
-        :param float speed:
-        :return: None
-        """
-
-        conv_mat = self.get_conv_mat()
-        if conv_mat is None:
-            rospy.logerr("face_toward: conv_mat not initialized")
-            return
-
-        xyz1 = numpy.array([x, y, z, 1.0])
-        xyz = numpy.dot(conv_mat, xyz1)
-        msg = Target()
-        msg.x = xyz[0]
-        msg.y = xyz[1]
-        msg.z = xyz[2]
-        msg.speed = speed
-
-        self.face_target_pub.publish(msg)
-        rospy.logdebug("published face_(x={}, y={}, z={}, speed={})".format(x, y, z, speed))
-
     def blink(self, mean, variation):
         """ Set the robot's blink cycle
 
@@ -218,7 +129,7 @@ class ActionCtrl:
 
     def blink_cancel(self):
         try:
-            self.blender_set_param_srv(ActionCtrl.BPY_PARAM_BLINK, False)
+            self.blender_set_param_srv(ActionCtrl.BPY_PARAM_BLINK, "False")
             rospy.logdebug("blink_cancel: blender_api/set_param service called")
         except rospy.ServiceException, e:
             rospy.logerr("blink_cancel: blender_api/set_param service call failed %s" % e)
@@ -266,7 +177,7 @@ class ActionCtrl:
 
     def saccade_cancel(self):
         try:
-            self.blender_set_param_srv(ActionCtrl.BPY_PARAM_SACCADE, False)
+            self.blender_set_param_srv(ActionCtrl.BPY_PARAM_SACCADE, "False")
             rospy.logdebug("saccade_cancel: blender_api/set_param service called")
         except rospy.ServiceException, e:
             rospy.logerr("saccade_cancel: blender_api/set_param service call failed %s" % e)

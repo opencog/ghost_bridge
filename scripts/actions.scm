@@ -66,7 +66,7 @@
 ; Cancel the current utterance being spoken
 ;
 ; Example usage:
-;   (cog-execute! (Put (DefinedSchema "say-cancel")))
+;   (cog-execute! (Put (DefinedSchema "say-cancel") (List)))
 ;
 
 (delete-definition say-cancel)
@@ -105,7 +105,7 @@
 ; Cancel the current gaze-at action
 ;
 ; Example usage:
-;   (cog-execute! (Put (DefinedSchema "gaze-at-cancel")))
+;   (cog-execute! (Put (DefinedSchema "gaze-at-cancel") (List)))
 ;
 
 (delete-definition gaze-at-cancel)
@@ -147,7 +147,7 @@
 ; Cancel the current blink cycle
 ;
 ; Example usage:
-;   (cog-execute! (Put (DefinedSchema "blink-cancel")))
+;   (cog-execute! (Put (DefinedSchema "blink-cancel") (List)))
 ;
 
 (delete-definition blink-cancel)
@@ -213,7 +213,7 @@
 ; Cancel the current saccade cycle
 ;
 ; Example usage:
-;   (cog-execute! (Put (DefinedSchema "saccade-cancel")))
+;   (cog-execute! (Put (DefinedSchema "saccade-cancel") (List)))
 ;
 
 (delete-definition saccade-cancel)
