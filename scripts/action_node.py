@@ -75,6 +75,12 @@ def blink(mean_node, variation_node):
     return TruthValue(1, 1)
 
 
+def blink_cancel():
+    rospy.logdebug("blink_cancel()")
+    action_ctrl.blink_cancel()
+    return TruthValue(1, 1)
+
+
 def saccade(mean_node, variation_node, paint_scale_node, eye_size_node, eye_distance_node, mouth_width_node,
             mouth_height_node, weight_eyes_node, weight_mouth_node):
     mean = float(mean_node.name)
