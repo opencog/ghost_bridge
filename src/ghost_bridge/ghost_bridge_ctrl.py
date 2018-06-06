@@ -28,7 +28,6 @@ class GhostBridge:
         1: "right"
     }
 
-    TTS_STOP_SLEEP_TIME = 2.0
 
     def __init__(self):
         self.hostname = "localhost"
@@ -40,6 +39,7 @@ class GhostBridge:
         self.face_id = ""
         self.tts_speaking = False
         self.sr_continuous = True
+	self.sr_tts_timeout = 0.0
 
         # max size of 1 so that we all ways have the latest ChatScript answer if there is one
         self.cs_fallback_queue = Queue(maxsize=1)
@@ -57,6 +57,7 @@ class GhostBridge:
 
     def dynamic_reconfigure_callback(self, config, level):
         self.sr_continuous = config['sr_continuous']
+        self.sr_tts_timeout = config['sr_tts_timeout']
         rospy.logdebug("Dynamic reconfigure callback result: {0}".format(config))
         return config
 
@@ -66,7 +67,7 @@ class GhostBridge:
             self.action_feedback_ctrl.say_started()
         elif msg.data == "stop":
             if not self.sr_continuous:
-                rospy.sleep(GhostBridge.TTS_STOP_SLEEP_TIME)
+                rospy.sleep(self.sr_tts_timeout)
             self.tts_speaking = False
             self.action_feedback_ctrl.say_finished()
 
