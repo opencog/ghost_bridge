@@ -167,6 +167,7 @@ install(PROGRAMS
   scripts/run.sh
   scripts/action_node.py
   scripts/ghost_bridge_node.py
+  scripts/face_tracker_node.py
   scripts/actions.scm
   scripts/load-actions.scm
   scripts/load-opencog.scm
