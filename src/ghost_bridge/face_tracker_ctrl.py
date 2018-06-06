@@ -11,20 +11,22 @@ class FaceTracker(object):
         self.eye_speed = 0.7
         self.head_speed = 0.5
 
+        self.face_frame = "closest_face"
+        self.blender_frame = "blender"
+
         # Publishers for making the face and eyes look at a point
         self.face_target_pub = rospy.Publisher("/blender_api/set_face_target", Target, queue_size=1)
         self.gaze_target_pub = rospy.Publisher("/blender_api/set_gaze_target", Target, queue_size=1)
 
     def run(self):
         while not rospy.is_shutdown():
-            print("face tracking before")
-            if self.tf.frameExists("/base_link") and self.tf.frameExists("/blender"):
-                print("face tracking inside")
-                t = self.tf.getLatestCommonTime("/closest_face", "/blender")
-                position, quaternion = self.tf.lookupTransform("/closest_face", "/blender", t)
-                x = position.x
-                y = position.y
-                z = position.z
+            if self.tf.frameExists(self.face_frame) and self.tf.frameExists(self.blender_frame):
+                t = self.tf.getLatestCommonTime(self.face_frame, self.blender_frame)
+                position, quaternion = self.tf.lookupTransform(self.blender_frame, self.face_frame, t)
+                x = position[0]
+                y = position[1]
+                z = position[2]
+                print("face tracking inside: ", x, y, z)
                 self.point_eyes_at_point(x, y, z, self.eye_speed)
                 self.face_toward_point(x, y, z, self.head_speed)
 
