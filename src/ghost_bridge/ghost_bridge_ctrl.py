@@ -72,6 +72,9 @@ class GhostBridge:
 
     def cs_say_cb(self, msg):
         rospy.logdebug("cs_fallback_text: '{}'".format(msg.text))
+        # Empty the queue and put new answer.
+        while not self.cs_fallback_queue.empty():
+            self.cs_fallback_queue.get_nowait()
         self.cs_fallback_queue.put(msg.text)
 
     def ghost_say_cb(self, msg):
