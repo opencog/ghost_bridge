@@ -19,6 +19,9 @@
     <!-- Face tracker -->
     <node name="face_tracker" pkg="ghost_bridge" type="face_tracker_node.py" output="screen"/>
 
+     <!-- Face tracker -->
+    <node name="mirroring" pkg="ros_people_model" type="mirroring.py" output="screen"/>
+
     <!-- Ghost Bridge -->
     <node name="faces_throttler" type="throttle" pkg="topic_tools" args="messages /faces 2 /faces_throttled" output="screen"/>
     <node name="ghost_bridge" pkg="ghost_bridge" type="ghost_bridge_node.py" output="screen"/>
