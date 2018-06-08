@@ -109,6 +109,11 @@ def saccade_cancel():
 
 def emote(name_node, magnitude_node, duration_node, blend_node):
     name = name_node.name
+
+    # ugly hack because blender animation names are different
+    if name is "happy":
+        name = "happy.001"
+
     magnitude = float(magnitude_node.name)
     duration = float(duration_node.name)
     blend = blend_node.name == "True"
