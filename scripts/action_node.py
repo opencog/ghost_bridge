@@ -114,6 +114,12 @@ def emote(name_node, magnitude_node, duration_node, blend_node):
     if name is "happy":
         name = "happy.001"
 
+    if name is "worry":
+        name = "irritated"
+
+    if name is "smile":
+        name = "happy.002"
+
     magnitude = float(magnitude_node.name)
     duration = float(duration_node.name)
     blend = blend_node.name == "True"
