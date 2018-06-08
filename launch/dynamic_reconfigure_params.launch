@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
-    <arg name="name" default="sophia10"/>
+    <arg name="name" default="sophia11"/>
 
     <group ns="/$(arg name)">
         <node name="$(anon dynparam_speech_recognizer)" pkg="dynamic_reconfigure" type="dynparam"
