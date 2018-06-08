@@ -11,7 +11,7 @@ class FaceTracker(object):
     def __init__(self):
         self.rate = rospy.Rate(2)
         self.tf = tf.TransformListener()
-        self.eye_speed = 0.5
+        self.eye_speed = 0.2
         self.head_speed = 0.7
 
         self.face_frame = "closest_face"
