@@ -2,7 +2,7 @@
 
 <launch>
     <!-- Set dynamic_reconfigure parameters -->
-    <include file="$(find ghost_bridge)/launch/dynamic_reconfigure_params.launch" />
+    <!--<include file="$(find ghost_bridge)/launch/dynamic_reconfigure_params.launch" />-->
 
     <!-- RealSense camera settings -->
     <arg name="camera_width" default="1280"/>
