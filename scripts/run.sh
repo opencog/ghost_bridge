@@ -17,6 +17,9 @@ then
     GB_LAUNCH_FILE='robot.launch'
 fi
 
+# get robot name from rosparam
+ROBOT_NAME="$(rosparam get /robot_name)"
+
 # start opencog processes in tmux session.
 start_opencog_tmux_session()
 {
@@ -37,7 +40,7 @@ start_opencog_tmux_session()
 
   # Start ghost_bridge
   tmux new-window -t "$_session_name:" -n "ghost_bridge" \
-    "roslaunch ghost_bridge $GB_LAUNCH_FILE;
+    "roslaunch ghost_bridge $GB_LAUNCH_FILE robot_name:=$ROBOT_NAME;
     $SHELL"
 
   # Start a shell to cogserver
