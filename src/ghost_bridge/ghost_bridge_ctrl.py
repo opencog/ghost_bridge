@@ -168,7 +168,7 @@ class GhostBridge:
           self.refractory_block = True
           #rospy.Timer(rospy.Duration((self.stt_cutoff_time * 2.0) + 0.0001), self.reset_refractory, oneshot=True)
 
-          self.perception_ctrl.perceive_sentence(self.face_id, tosend[:64])
+          self.perception_ctrl.perceive_sentence(self.face_id, tosend)
           self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
 
     def reset_refractory(self, evt):
