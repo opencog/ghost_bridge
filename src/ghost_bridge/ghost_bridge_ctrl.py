@@ -168,8 +168,8 @@ class GhostBridge:
           #block perception for a while to fix blocking
           self.refractory_block = True
           if self.refractimer is not None:
-              self.refracttimer.shutdown()
-              self.refracttimer = None
+              self.refractimer.shutdown()
+              self.refractimer = None
           self.refractimer = rospy.Timer(rospy.Duration(10.0), self.reset_refractory, oneshot=True)
           rospy.logdebug("(ghost '{}')".format(tosend))
           self.perception_ctrl.perceive_sentence(self.face_id, tosend[:64])
