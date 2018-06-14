@@ -1,5 +1,7 @@
 from Queue import Queue, Empty
 
+import time
+import re
 import rospy
 from dynamic_reconfigure.server import Server
 from ghost_bridge.action_feedback_ctrl import ActionFeedbackCtrl
@@ -39,7 +41,11 @@ class GhostBridge:
         self.face_id = ""
         self.tts_speaking = False
         self.sr_continuous = True
-	self.sr_tts_timeout = 0.0
+        self.sr_tts_timeout = 0.0
+
+        self.timer = None
+        self.input_buffer = ""
+        self.stt_cutoff_time = 0.0
 
         # max size of 1 so that we all ways have the latest ChatScript answer if there is one
         self.cs_fallback_queue = Queue(maxsize=1)
@@ -93,8 +99,16 @@ class GhostBridge:
             self.publish_tts(msg.text)
 
     def publish_tts(self, text):
+        regex = '{% set delay=([0-9]+) %}'
+        reg_result = re.compile(regex).findall(text)
+        if reg_result:
+          #print("---> regex caught")
+          self.stt_cutoff_time = int(reg_result[0])
+          self.timer = None
+          rospy.logdebug("setting delay to '{}'".format(self.stt_cutoff_time))
+        re.match('{% set delay=[0-9]+ %}', text)
         msg = TTS()
-        msg.text = text
+        msg.text = re.sub(regex, '', text)
         msg.lang = 'en-US'
         self.tts_pub.publish(msg)
         rospy.logdebug("published tts: '{}', '{}'".format(msg.text, msg.lang))
@@ -102,13 +116,31 @@ class GhostBridge:
     def perceive_word_cb(self, msg):
         self.perception_ctrl.perceive_word(self.face_id, msg.utterance)
         self.perception_ctrl.perceive_face_talking(self.face_id, 1.0)
+        self.reset_timer()
 
     def perceive_sentence_cb(self, msg):
+        #print("perceive sentence cb")
         if self.sr_continuous or not self.tts_speaking:
-            self.perception_ctrl.perceive_sentence(self.face_id, msg.utterance)
-            self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
+            self.input_buffer += msg.utterance
+            self.reset_timer()
         else:
-            rospy.logdebug("suppressing sentence perceived to GHOST")
+            rospy.logwarn("suppressing sentence perceived to GHOST")
+
+    def send_perceived_sentence(self, evt):
+        #print("send perceived sentence called")
+        if self.input_buffer:
+          tosend = self.input_buffer
+          self.input_buffer = ""
+          self.perception_ctrl.perceive_sentence(self.face_id, tosend)
+          self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
+
+    def reset_timer(self):
+        #print("--> Reset timer called")
+        if self.timer is not None:
+            self.timer.shutdown()
+            self.timer = None
+        self.timer = rospy.Timer(rospy.Duration(self.stt_cutoff_time + 0.0001), self.send_perceived_sentence, oneshot=True)
+        #self.timer.start()
 
     def faces_cb(self, data):
         for face in data.faces:
