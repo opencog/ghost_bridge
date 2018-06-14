@@ -46,6 +46,7 @@ class GhostBridge:
         self.refractory_block = False
 
         self.timer = None
+        self.refractimer = None
         self.input_buffer = ""
         self.stt_cutoff_time = 0.0
 
@@ -166,9 +167,12 @@ class GhostBridge:
           self.input_buffer = ""
           #block perception for a while to fix blocking
           self.refractory_block = True
-          #rospy.Timer(rospy.Duration((self.stt_cutoff_time * 2.0) + 0.0001), self.reset_refractory, oneshot=True)
-
-          self.perception_ctrl.perceive_sentence(self.face_id, tosend)
+          if self.refractimer is not None:
+              self.refracttimer.shutdown()
+              self.refracttimer = None
+          self.refractimer = rospy.Timer(rospy.Duration(10.0), self.reset_refractory, oneshot=True)
+          rospy.logdebug("(ghost '{}')".format(tosend))
+          self.perception_ctrl.perceive_sentence(self.face_id, tosend[:64])
           self.perception_ctrl.perceive_face_talking(self.face_id, 0.0)
 
     def reset_refractory(self, evt):
