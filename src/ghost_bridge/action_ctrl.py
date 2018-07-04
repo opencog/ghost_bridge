@@ -107,7 +107,6 @@ class ActionCtrl:
 
         rospy.logdebug("published shutup")
 
-
     # TODO: use actionlib
     def gaze_at(self, face_id, speed):
         rospy.wait_for_service('set_gaze_focus')

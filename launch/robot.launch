@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
+    <arg name="robot_name"/>
+
     <!-- Set dynamic_reconfigure parameters -->
-    <!--<include file="$(find ghost_bridge)/launch/dynamic_reconfigure_params.launch" />-->
+    <include file="$(find ghost_bridge)/launch/dynamic_reconfigure_params.launch" >
+        <arg name="robot_name" value="$(arg robot_name)"/>
+    </include>
 
     <!-- RealSense camera settings -->
     <arg name="camera_width" default="1280"/>
