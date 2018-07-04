@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <launch>
-    <arg name="robot_name"/>
-
     <!-- Set dynamic_reconfigure parameters -->
-    <include file="$(find ghost_bridge)/launch/dynamic_reconfigure_params.launch" >
-        <arg name="robot_name" value="$(arg robot_name)"/>
-    </include>
+    <!--<include file="$(find ghost_bridge)/launch/dynamic_reconfigure_params.launch" />-->
 
     <!-- RealSense camera settings -->
     <arg name="camera_width" default="1280"/>
@@ -51,8 +47,23 @@
 
     <!-- Face tracker -->
     <node name="mirroring" pkg="ros_people_model" type="mirroring.py" output="screen"/>
+    <node pkg="tf" type="static_transform_publisher" name="audience_broadcaster" args="0 0 0 0 0 0 1 base_link audience 100" />
 
     <!-- Ghost Bridge -->
-    <node name="faces_throttler" type="throttle" pkg="topic_tools" args="messages /faces 2 /faces_throttled" output="screen"/>
-    <node name="ghost_bridge" pkg="ghost_bridge" type="ghost_bridge_node.py" output="screen"/>
+    <node name="faces_throttler" type="throttle" pkg="topic_tools" args="messages /faces 0.3 /faces_throttled" output="screen"/>
+    <node name="ghost_bridge" pkg="ghost_bridge" type="ghost_bridge_node.py" output="log"/>
+
+  <node name="video_recorder" pkg="video_recorder" type="recorder.py" output="screen" required="true">
+
+      <param name="output_width" type="int" value="960" />
+      <param name="output_height" type="int" value="540" />
+      <param name="output_format" value="mp42" />
+      <param name="output_path" value="/home/hr/VIDEOLOG/camera_[timestamp].avi" />
+
+      <param name="output_topic" value="/video_recorder/image_raw" />
+
+      <param name="source1" value="/camera/color/image_raw,0,0,960,540" />
+  </node>
+
+
 </launch>

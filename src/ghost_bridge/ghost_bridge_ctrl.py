@@ -9,7 +9,7 @@ from ghost_bridge.perception_ctrl import PerceptionCtrl
 from hr_msgs.msg import ChatMessage
 from hr_msgs.msg import TTS
 from ros_people_model.msg import Faces
-from std_msgs.msg import String
+from std_msgs.msg import String, Float32
 
 
 class GhostBridge:
@@ -39,7 +39,7 @@ class GhostBridge:
         self.face_id = ""
         self.tts_speaking = False
         self.sr_continuous = True
-	self.sr_tts_timeout = 0.0
+        self.sr_tts_timeout = 0.0
 
         # max size of 1 so that we all ways have the latest ChatScript answer if there is one
         self.cs_fallback_queue = Queue(maxsize=1)
@@ -52,6 +52,7 @@ class GhostBridge:
         rospy.Subscriber(self.robot_name + "/words", ChatMessage, self.perceive_word_cb)
         rospy.Subscriber(self.robot_name + "/speech", ChatMessage, self.perceive_sentence_cb)
         rospy.Subscriber('/faces_throttled', Faces, self.faces_cb)
+        rospy.Subscriber(self.robot_name + "/safe/Neck_Rotation_controller/command", Float32, self.gaze_position_cb)
 
         self.dynamic_reconfigure_srv = Server(GhostBridgeConfig, self.dynamic_reconfigure_callback)
 
@@ -122,3 +123,9 @@ class GhostBridge:
             if len(face.emotions) > 0:
                 for i, confidence in enumerate(face.emotions):
                     self.perception_ctrl.perceive_emotion(face.face_id, GhostBridge.EMOTION_MAP[i], confidence)
+
+    def gaze_position_cb(self, msg):
+        if msg.data < 0:
+            self.perception_ctrl.perceive_neck_direction("left")
+        else:
+            self.perception_ctrl.perceive_neck_direction("right")

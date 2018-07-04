@@ -2,6 +2,7 @@ import tf
 import rospy
 import math
 from blender_api_msgs.msg import Target
+from ghost_bridge.srv import GazeFocus
 
 
 class FaceTracker(object):
@@ -21,6 +22,9 @@ class FaceTracker(object):
         # Publishers for making the face and eyes look at a point
         self.face_target_pub = rospy.Publisher("/blender_api/set_face_target", Target, queue_size=1)
         self.gaze_target_pub = rospy.Publisher("/blender_api/set_gaze_target", Target, queue_size=1)
+
+        # kick off the face frame setting service
+        self.set_gaze_srv = rospy.Service('set_gaze_focus', GazeFocus, self.handle_set_gaze_focus)
 
     def run(self):
         while not rospy.is_shutdown():
@@ -85,3 +89,7 @@ class FaceTracker(object):
 
         self.face_target_pub.publish(msg)
         rospy.logdebug("published face_(x={}, y={}, z={}, speed={})".format(x, y, z, speed))
+
+    def handle_set_gaze_focus(self, req):
+        self.face_frame = req.face_frame
+        self.head_speed = req.speed

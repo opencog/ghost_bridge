@@ -102,3 +102,7 @@ class PerceptionCtrl:
 
         content = '(ghost "{}")\n'.format(sentence)
         netcat(self.hostname, self.port, content)
+
+    def perceive_neck_direction(self, direction):
+        content = '(perceive-neck-dir "{}")\n'.format(direction)
+        netcat(self.hostname, self.port, content)

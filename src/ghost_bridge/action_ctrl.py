@@ -27,6 +27,7 @@ from blender_api_msgs.msg import SaccadeCycle
 from blender_api_msgs.msg import SetGesture
 from blender_api_msgs.msg import SomaState
 from ghost_bridge.msg import GhostSay
+from ghost_bridge.srv import GazeFocus
 from blender_api_msgs.srv import SetParam
 from std_msgs.msg import String
 
@@ -106,11 +107,29 @@ class ActionCtrl:
 
         rospy.logdebug("published shutup")
 
+
+    # TODO: use actionlib
     def gaze_at(self, face_id, speed):
-        rospy.logwarn("gaze_at: not implemented")
+        rospy.wait_for_service('set_gaze_focus')
+        set_gaze_focus = rospy.ServiceProxy('set_gaze_focus', GazeFocus)
+
+        try:
+            set_gaze_focus(face_id, speed)
+        except rospy.ServiceException as e:
+            err = "Service didn't process request: " + str(e)
+            print(err)
+            rospy.logerr(err)
 
     def gaze_at_cancel(self):
-        rospy.logwarn("gaze_at_cancel: not implemented")
+        rospy.wait_for_service('set_gaze_focus')
+        set_gaze_focus = rospy.ServiceProxy('set_gaze_focus', GazeFocus)
+
+        try:
+            set_gaze_focus("audience", speed=0.7)
+        except rospy.ServiceException as e:
+            err = "Service didn't process request: " + str(e)
+            print(err)
+            rospy.logerr(err)
 
     def blink(self, mean, variation):
         """ Set the robot's blink cycle
