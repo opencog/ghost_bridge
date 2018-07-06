@@ -7,7 +7,7 @@
         <node name="$(anon dynparam_speech_recognizer)" pkg="dynamic_reconfigure" type="dynparam"
               args="set_from_parameters speech_recognizer">
             <param name="enable" type="bool" value="true"/>
-            <param name="continous" type="bool" value="false"/>
+            <param name="continuous" type="bool" value="false"/>
         </node>
 
         <node name="$(anon dynparam_chatbot)" pkg="dynamic_reconfigure" type="dynparam"
