@@ -2,7 +2,7 @@ import tf
 import rospy
 import math
 from blender_api_msgs.msg import Target
-from ghost_bridge.srv import GazeFocus
+from ghost_bridge.srv import GazeFocus, GazeFocusResponse
 
 
 class FaceTracker(object):
@@ -17,6 +17,7 @@ class FaceTracker(object):
 
         self.face_frame = "closest_face"
         self.blender_frame = "blender"
+        self.idle_frame = "audience"
         self.last_position = None
 
         # Publishers for making the face and eyes look at a point
@@ -31,20 +32,25 @@ class FaceTracker(object):
             if self.tf.frameExists(self.face_frame) and self.tf.frameExists(self.blender_frame):
                 t = self.tf.getLatestCommonTime(self.face_frame, self.blender_frame)
                 position, quaternion = self.tf.lookupTransform(self.blender_frame, self.face_frame, t)
-                x = position[0]
-                y = position[1]
-                z = position[2]
+            elif self.tf.frameExists(self.idle_frame) and self.tf.frameExists(self.blender_frame):
+                position, quaternion = self.tf.lookupTransform(self.blender_frame, self.idle_frame)
+            else:
+                self.rate.sleep()
 
-                update_target = self.last_position is None
+            x = position[0]
+            y = position[1]
+            z = position[2]
 
-                if self.last_position is not None:
-                    dist = FaceTracker.distance(position, self.last_position)
-                    update_target = dist > FaceTracker.DIST_THRESH
+            update_target = self.last_position is None
 
-                if update_target:
-                    self.point_eyes_at_point(x, y, z, self.eye_speed)
-                    self.face_toward_point(x, y, z, self.head_speed)
-                    self.last_position = position
+            if self.last_position is not None:
+                dist = FaceTracker.distance(position, self.last_position)
+                update_target = dist > FaceTracker.DIST_THRESH
+
+            if update_target:
+                self.point_eyes_at_point(x, y, z, self.eye_speed)
+                self.face_toward_point(x, y, z, self.head_speed)
+                self.last_position = position
 
             self.rate.sleep()
 
@@ -93,3 +99,5 @@ class FaceTracker(object):
     def handle_set_gaze_focus(self, req):
         self.face_frame = req.face_frame
         self.head_speed = req.speed
+
+        return GazeFocusResponse()

@@ -107,13 +107,16 @@ class ActionCtrl:
 
         rospy.logdebug("published shutup")
 
-    # TODO: use actionlib
+    # TODO: use actionlib, add parametrization
     def gaze_at(self, face_id, speed):
         rospy.wait_for_service('set_gaze_focus')
         set_gaze_focus = rospy.ServiceProxy('set_gaze_focus', GazeFocus)
 
         try:
-            set_gaze_focus(face_id, speed)
+            set_gaze_focus("closest_face", 0.7)
+            with open("ghost_bridge.log", 'w') as logger:
+                logger.write("gazing at closest")
+
         except rospy.ServiceException as e:
             err = "Service didn't process request: " + str(e)
             print(err)

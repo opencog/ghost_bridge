@@ -9,7 +9,10 @@ from ghost_bridge.perception_ctrl import PerceptionCtrl
 from hr_msgs.msg import ChatMessage
 from hr_msgs.msg import TTS
 from ros_people_model.msg import Faces
-from std_msgs.msg import String, Float32
+from std_msgs.msg import String, Float64
+import logging
+
+logger = logging.getLogger('ghost.ghost_bridge')
 
 
 class GhostBridge:
@@ -52,7 +55,8 @@ class GhostBridge:
         rospy.Subscriber(self.robot_name + "/words", ChatMessage, self.perceive_word_cb)
         rospy.Subscriber(self.robot_name + "/speech", ChatMessage, self.perceive_sentence_cb)
         rospy.Subscriber('/faces_throttled', Faces, self.faces_cb)
-        rospy.Subscriber(self.robot_name + "/safe/Neck_Rotation_controller/command", Float32, self.gaze_position_cb)
+        rospy.Subscriber(self.robot_name + "/safe/Neck_Rotation_controller/command", Float64,
+                         self.gaze_position_cb, queue_size=1)
 
         self.dynamic_reconfigure_srv = Server(GhostBridgeConfig, self.dynamic_reconfigure_callback)
 
@@ -125,7 +129,11 @@ class GhostBridge:
                     self.perception_ctrl.perceive_emotion(face.face_id, GhostBridge.EMOTION_MAP[i], confidence)
 
     def gaze_position_cb(self, msg):
-        if msg.data < 0:
+        angle = msg.data
+        rospy.logwarn("gaze_pos_cb angle: " + str(angle))
+        if angle > -0.3 and angle < 0.3:
+            self.perception_ctrl.perceive_neck_direction("straight")
+        elif angle > 0.3:
             self.perception_ctrl.perceive_neck_direction("left")
-        else:
+        elif angle < -0.3:
             self.perception_ctrl.perceive_neck_direction("right")
