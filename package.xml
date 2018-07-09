@@ -63,6 +63,7 @@
     <depend>dynamic_reconfigure</depend>
     <depend>ros_people_model</depend>
     <depend>topic_tools</depend>
+    <depend>actionlib_msgs</depend>
 
     <!-- The export tag contains other, unspecified, tags -->
     <export>
