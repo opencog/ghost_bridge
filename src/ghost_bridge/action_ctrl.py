@@ -27,9 +27,10 @@ from blender_api_msgs.msg import SaccadeCycle
 from blender_api_msgs.msg import SetGesture
 from blender_api_msgs.msg import SomaState
 from ghost_bridge.msg import GhostSay
-from ghost_bridge.srv import GazeFocus
 from blender_api_msgs.srv import SetParam
 from std_msgs.msg import String
+from actionlib import SimpleActionClient
+from ghost_bridge.msg import GazeAction, GazeGoal
 
 logger = logging.getLogger('hr.ghost_bridge_actions')
 
@@ -77,6 +78,11 @@ class ActionCtrl:
         # blender set param
         self.blender_set_param_srv = rospy.ServiceProxy('/blender_api/set_param', SetParam)
 
+        # Create gaze action client and wait for server
+        self.gaze_goal = None
+        self.gaze_client = SimpleActionClient('/gaze_action', GazeAction)
+        self.gaze_client.wait_for_server()
+
         # Subscribers to get the available emotions and gestures
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
         rospy.Subscriber("/blender_api/available_gestures", AvailableGestures, self.get_gestures_cb)
@@ -107,31 +113,18 @@ class ActionCtrl:
 
         rospy.logdebug("published shutup")
 
-    # TODO: use actionlib, add parametrization
     def gaze_at(self, face_id, speed):
-        rospy.wait_for_service('set_gaze_focus')
-        set_gaze_focus = rospy.ServiceProxy('set_gaze_focus', GazeFocus)
+        self.gaze_goal = GazeGoal(target=face_id)
+        self.gaze_client.send_goal(self.gaze_goal, done_cb=self.done_cb)
+        rospy.logdebug("published gaze_at(face_id={}, speed={})".format(face_id, speed))
 
-        try:
-            set_gaze_focus("closest_face", 0.7)
-            with open("ghost_bridge.log", 'w') as logger:
-                logger.write("gazing at closest")
-
-        except rospy.ServiceException as e:
-            err = "Service didn't process request: " + str(e)
-            print(err)
-            rospy.logerr(err)
+    def done_cb(self, msg):
+        rospy.logdebug("DONE")
 
     def gaze_at_cancel(self):
-        rospy.wait_for_service('set_gaze_focus')
-        set_gaze_focus = rospy.ServiceProxy('set_gaze_focus', GazeFocus)
-
-        try:
-            set_gaze_focus("audience", speed=0.7)
-        except rospy.ServiceException as e:
-            err = "Service didn't process request: " + str(e)
-            print(err)
-            rospy.logerr(err)
+        self.gaze_client.cancel_all_goals()
+        self.gaze_goal = None
+        rospy.logdebug("published gaze_at_cancel()")
 
     def blink(self, mean, variation):
         """ Set the robot's blink cycle
