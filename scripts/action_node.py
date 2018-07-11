@@ -153,3 +153,9 @@ def soma_cancel(name_node):
     rospy.logdebug("soma_cancel(name='{}')".format(name))
     action_ctrl.soma_cancel(name)
     return TruthValue(1, 1)
+
+
+def sing():
+    rospy.logdebug("sing()")
+    action_ctrl.sing()
+    return TruthValue(1, 1)
