@@ -21,10 +21,12 @@
 ; TODO: I think 'stop' might be better than 'cancel' for stopping each action
 ;
 
+(define update-parameter "update-parameter")
+
+(define gaze-at "gaze-at")
 (define say "say")
 (define say-cancel "say-cancel")
 
-(define gaze-at "gaze-at")
 (define gaze-at-cancel "gaze-at-cancel")
 
 (define blink "blink")
@@ -38,6 +40,31 @@
 
 (define soma "soma")
 (define soma-cancel "soma-cancel")
+
+; -------------------------------------------------------------
+; Vary the values of parameters of different components
+;
+; Example usage:
+;   (cog-execute!
+;     (Put (DefinedSchema "update-parameter")
+;       (List (Concept "speech") (Concept "volume") (Concept "2"))))
+
+
+(delete-definition update-parameter)
+(DefineLink
+ (DefinedSchema update-parameter)
+ (LambdaLink
+  (VariableList
+   (Variable "$component")
+   (Variable "$parameter")
+   (Variable "$value"))
+  (SequentialAndLink
+   (EvaluationLink (GroundedPredicate "py:update_parameter")
+    (ListLink
+     (Variable "$component")
+     (Variable "$parameter")
+     (Variable "$value")))
+  )))
 
 ; -------------------------------------------------------------
 ; Say something.

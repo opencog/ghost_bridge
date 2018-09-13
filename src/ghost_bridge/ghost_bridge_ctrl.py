@@ -39,7 +39,7 @@ class GhostBridge:
         self.face_id = ""
         self.tts_speaking = False
         self.sr_continuous = True
-	self.sr_tts_timeout = 0.0
+        self.sr_tts_timeout = 0.0
 
         # max size of 1 so that we all ways have the latest ChatScript answer if there is one
         self.cs_fallback_queue = Queue(maxsize=1)

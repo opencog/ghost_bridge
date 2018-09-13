@@ -38,6 +38,12 @@ action_ctrl = ActionCtrl()
 #
 # Must return TruthValue, since EvaluationLinks expect TruthValues.
 
+def update_parameter(component_node, parameter_node, value_node):
+    component = component_node.name
+    parameter = parameter_node.name
+    value = float(value_node.name)
+    action_ctrl.update_parameter(component, parameter, value)
+    return TruthValue(1, 1)
 
 def say(text_node, fallback_id_node):
     text = text_node.name
@@ -46,12 +52,10 @@ def say(text_node, fallback_id_node):
     action_ctrl.say(text, fallback_id)
     return TruthValue(1, 1)
 
-
 def say_cancel():
     rospy.logdebug("say_cancel()")
     action_ctrl.say_cancel()
     return TruthValue(1, 1)
-
 
 def gaze_at(face_id_node, speed_node):
     face_id = face_id_node.name
