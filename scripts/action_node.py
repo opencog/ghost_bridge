@@ -38,11 +38,11 @@ action_ctrl = ActionCtrl()
 #
 # Must return TruthValue, since EvaluationLinks expect TruthValues.
 
-def update_parameter(component_node, parameter_node, value_node):
+def set_parameter(component_node, parameter_node, value_node):
     component = component_node.name
     parameter = parameter_node.name
     value = float(value_node.name)
-    action_ctrl.update_parameter(component, parameter, value)
+    action_ctrl.set_parameter(component, parameter, value)
     return TruthValue(1, 1)
 
 def say(text_node, fallback_id_node):

@@ -88,8 +88,8 @@ class ActionCtrl:
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
         rospy.Subscriber("/blender_api/available_gestures", AvailableGestures, self.get_gestures_cb)
 
-    def update_parameter(self, component, parameter, value):
-        """Update the parameters of the robot
+    def set_parameter(self, component, parameter, value):
+        """Set the parameters of the robot
 
         :param str component: identifier of the robot component or function
         :param str parameter: identifier of the parameter
@@ -97,7 +97,7 @@ class ActionCtrl:
         :return: None
         """
         self.component_parameters[component][parameter] = value
-        rospy.logdebug("Updated parameter {}-{}={}".format(component, parameter, value))
+        rospy.logdebug("Set parameter {}-{} to {}".format(component, parameter, value))
 
     def say(self, text, fallback_id):
         """ Make the robot vocalize text

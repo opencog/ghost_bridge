@@ -21,7 +21,7 @@
 ; TODO: I think 'stop' might be better than 'cancel' for stopping each action
 ;
 
-(define update-parameter "update-parameter")
+(define set-parameter "set-parameter")
 
 (define gaze-at "gaze-at")
 (define say "say")
@@ -46,20 +46,20 @@
 ;
 ; Example usage:
 ;   (cog-execute!
-;     (Put (DefinedSchema "update-parameter")
+;     (Put (DefinedSchema "set-parameter")
 ;       (List (Concept "speech") (Concept "volume") (Concept "2"))))
 
 
-(delete-definition update-parameter)
+(delete-definition set-parameter)
 (DefineLink
- (DefinedSchema update-parameter)
+ (DefinedSchema set-parameter)
  (LambdaLink
   (VariableList
    (Variable "$component")
    (Variable "$parameter")
    (Variable "$value"))
   (SequentialAndLink
-   (EvaluationLink (GroundedPredicate "py:update_parameter")
+   (EvaluationLink (GroundedPredicate "py:set_parameter")
     (ListLink
      (Variable "$component")
      (Variable "$parameter")
