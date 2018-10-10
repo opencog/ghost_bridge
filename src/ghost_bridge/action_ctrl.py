@@ -76,9 +76,28 @@ class ActionCtrl:
         # blender set param
         self.blender_set_param_srv = rospy.ServiceProxy('/blender_api/set_param', SetParam)
 
+        # Dictionary of components with controllable parameters. It is structured as
+        # {component : { paramater : value }}
+        self.component_parameters = {}
+        # Speech output parameters based on https://www.w3.org/TR/speech-synthesis/
+        self.component_parameters["speech"] = {}
+        self.component_parameters["speech"]["volume"] = 0
+        self.component_parameters["speech"]["rate"] = 1
+
         # Subscribers to get the available emotions and gestures
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
         rospy.Subscriber("/blender_api/available_gestures", AvailableGestures, self.get_gestures_cb)
+
+    def set_parameter(self, component, parameter, value):
+        """Set the parameters of the robot
+
+        :param str component: identifier of the robot component or function
+        :param str parameter: identifier of the parameter
+        :param float value: the value of the parameter
+        :return: None
+        """
+        self.component_parameters[component][parameter] = value
+        rospy.logdebug("Set parameter {}-{} to {}".format(component, parameter, value))
 
     def say(self, text, fallback_id):
         """ Make the robot vocalize text
@@ -87,8 +106,10 @@ class ActionCtrl:
         :param str fallback_id: the id of the engine to fallback too
         :return: None
         """
+        ssml_template = "<prosody rate=\"{rate}\" volume=\"{volume}dB\"> {} </prosody>"
+        ssml_text = ssml_template.format(text, **self.component_parameters["speech"])
         msg = GhostSay()
-        msg.text = text
+        msg.text = ssml_text
         msg.fallback_id = fallback_id
 
         self.ghost_tts_pub.publish(msg)
