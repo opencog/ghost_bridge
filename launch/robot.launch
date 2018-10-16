@@ -8,36 +8,11 @@
         <arg name="robot_name" value="$(arg robot_name)"/>
     </include>
 
-    <!-- RealSense camera settings -->
-    <arg name="camera_width" default="1280"/>
-    <arg name="camera_height" default="720"/>
-    <arg name="camera_fps" default="30"/>
-
-    <include file="$(find realsense2_camera)/launch/rs_aligned_depth.launch">
-        <arg name="depth_width" value="$(arg camera_width)"/>
-        <arg name="depth_height" value="$(arg camera_height)"/>
-        <arg name="enable_depth" value="true"/>
-        <arg name="depth_fps" value="$(arg camera_fps)"/>
-
-        <arg name="infra1_width" value="$(arg camera_width)"/>
-        <arg name="infra1_height" value="$(arg camera_height)"/>
-        <arg name="enable_infra1" value="false"/>
-
-        <arg name="infra2_width" value="$(arg camera_width)"/>
-        <arg name="infra2_height" value="$(arg camera_height)"/>
-        <arg name="enable_infra2" value="false"/>
-
-        <arg name="color_width" value="$(arg camera_width)"/>
-        <arg name="color_height" value="$(arg camera_height)"/>
-        <arg name="enable_color" value="true"/>
-        <arg name="color_fps" value="$(arg camera_fps)"/>
-    </include>
-
     <!-- Perception -->
     <arg name="perception_fps" default="20"/>
 
     <include file="$(find ros_people_model)/launch/perception.launch">
-        <arg name="face_detector_topic" value="/camera/color/image_raw"/>
+        <arg name="face_detector_topic" value="$(arg robot_name)/perception/debug_image"/>
         <arg name="perception_fps" value="$(arg perception_fps)"/>
     </include>
 
