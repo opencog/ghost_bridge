@@ -29,6 +29,8 @@ from blender_api_msgs.msg import SomaState
 from ghost_bridge.msg import GhostSay
 from blender_api_msgs.srv import SetParam
 from std_msgs.msg import String
+from actionlib import SimpleActionClient
+from ghost_bridge.msg import GazeAction, GazeGoal
 
 logger = logging.getLogger('hr.ghost_bridge_actions')
 
@@ -76,6 +78,11 @@ class ActionCtrl:
         # blender set param
         self.blender_set_param_srv = rospy.ServiceProxy('/blender_api/set_param', SetParam)
 
+        # Create gaze action client and wait for server
+        self.gaze_goal = None
+        self.gaze_client = SimpleActionClient('/gaze_action', GazeAction)
+        self.gaze_client.wait_for_server()
+
         # Subscribers to get the available emotions and gestures
         rospy.Subscriber("/blender_api/available_emotion_states", AvailableEmotionStates, self.get_emotions_cb)
         rospy.Subscriber("/blender_api/available_gestures", AvailableGestures, self.get_gestures_cb)
@@ -107,10 +114,17 @@ class ActionCtrl:
         rospy.logdebug("published shutup")
 
     def gaze_at(self, face_id, speed):
-        rospy.logwarn("gaze_at: not implemented")
+        self.gaze_goal = GazeGoal(target=face_id)
+        self.gaze_client.send_goal(self.gaze_goal, done_cb=self.done_cb)
+        rospy.logdebug("published gaze_at(face_id={}, speed={})".format(face_id, speed))
+
+    def done_cb(self, msg):
+        rospy.logdebug("DONE")
 
     def gaze_at_cancel(self):
-        rospy.logwarn("gaze_at_cancel: not implemented")
+        self.gaze_client.cancel_all_goals()
+        self.gaze_goal = None
+        rospy.logdebug("published gaze_at_cancel()")
 
     def blink(self, mean, variation):
         """ Set the robot's blink cycle

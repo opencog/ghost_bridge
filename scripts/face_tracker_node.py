@@ -9,7 +9,7 @@ if __name__ == "__main__":
     try:
         rospy.init_node('face_tracker', log_level=rospy.DEBUG)
         node = FaceTracker()
-        node.run()
+        rospy.spin()
     except rospy.ROSInterruptException as e:
         rospy.logerr(e)
 
