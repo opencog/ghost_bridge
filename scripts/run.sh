@@ -5,17 +5,31 @@
 #
 
 set -e
+
 _session_name="opencog"
 
 # hrtool workspace
 HR_WORKSPACE="$(hr env | grep HR_WORKSPACE | cut -d = -f 2)"
 
-# choose ghost bridge launch file name
+# Default launch file name
 GB_LAUNCH_FILE='avatar.launch'
-if [ $1 == 'robot' ]
-then
-    GB_LAUNCH_FILE='robot.launch'
-fi
+
+# Handle command-line arguments
+for i in ${@}; do
+  case $i in
+    in-gdb)
+      GDB="gdb -ex r --args"
+      echo "Will run opencog in gdb" ;;
+    enable-ecan)
+      ECAN="-- enable-ecan"
+      echo "Will start ecan" ;;
+    robot)
+      GB_LAUNCH_FILE='robot.launch';;
+    *)
+      echo "only 'in-gdb', 'enable-ecan' and 'robot' arguments are allowed"
+      exit 1 ;;
+  esac
+done
 
 # get robot name from rosparam
 ROBOT_NAME="$(rosparam get /robot_name)"
@@ -35,7 +49,7 @@ start_opencog_tmux_session()
   # TODO: catkin_find should be used to find the correct path as this will not work in non dev environments
   tmux new-window -t "$_session_name:" -n "cogserver" \
     "cd $HR_WORKSPACE/HEAD/src/ghost_bridge/scripts &&
-    guile -l load-opencog.scm;
+    $GDB guile -l load-opencog.scm $ECAN;
     $SHELL"
 
   # Start ghost_bridge
