@@ -29,7 +29,7 @@ Follow the steps below to setup the ghost_bridge stack.
 Setup the Hanson Robotics head stack by following [these instructions](https://github.com/hansonrobotics/hrtool).
 
 #### 2. Configure ~/.bashrc
-Add the following to your ~/.bashrc, 
+Add the following to your ~/.bashrc,
 ```bash
 source /opt/ros/kinetic/setup.bash
 export HR_WORKSPACE="$(hr env | grep HR_WORKSPACE | cut -d = -f 2)"
@@ -178,6 +178,16 @@ rosrun ghost_bridge run.sh
 Then run ghost_bridge with the actual robot:
 ```bash
 rosrun ghost_bridge run.sh robot
+```
+
+For running opencog in gdb use the optional argument `in-gdb`:
+```bash
+rosrun ghost_bridge run.sh in-gdb
+```
+
+For starting ecan in opencog use the optional argment `enable-ecan`:
+```bash
+rosrun ghost_bridge run.sh enable-ecan
 ```
 
 To stop the robot:
