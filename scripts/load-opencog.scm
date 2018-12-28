@@ -60,11 +60,16 @@
     'GroundedPredicateNode)
 )
 
-; apply ECAN filter
-(ec)
+; Handle command-line arguments
+(when (and (equal? 2 (length (command-line)))
+           (equal? "enable-ecan" (cadr (command-line))))
+  ; apply ECAN filter
+  (ec)
 
-; start the ECAN agents
-(system (string-append "echo \"" start-ecan-agents "\" | nc localhost 17001"))
+  ; start the ECAN agents
+  (system (string-append "echo \"" start-ecan-agents
+    "\" | nc localhost 17001"))
+)
 
 ; start recording perception inputs after a delay of few seconds.
 (sleep 5)
