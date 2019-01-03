@@ -19,9 +19,7 @@
 
 (load "load-actions.scm")
 
-(ecan-based-ghost-rules #t)
 (set-relex-server-host)
-
 (start-cogserver "opencog.conf")
 (cog-logger-set-stdout! #f)
 
